@@ -1,6 +1,6 @@
 from AttackField import AttackField
 from mesa import Model
-from CustomStagedActivation import CustomStagedActivation
+from mesa.time import StagedActivation
 from Player import Player
 from Deck import Deck
 
@@ -24,7 +24,7 @@ class DurakModel(Model):
         self.attack_fields = []
         self.num_players = num_players
         self.num_starting_cards = num_starting_cards
-        self.schedule = CustomStagedActivation(self) #TODO: Create the activation stages based on the game
+        self.schedule = StagedActivation(self) #TODO: Create the activation stages based on the game
 
         for i in range(self.num_players):
             # Create the attack fields
@@ -48,15 +48,25 @@ class DurakModel(Model):
                 player.receive_card(self.deck.deal())
 
 
+        # print(self.deck)
+        # print(self.attack_fields)
+        
+        # for player in self.players:
+        #     player.attack_field.add_card(self.deck.deal())
+        
+        # for player in self.players:
+        #     print(str(player.id) + "'s attack field: " + str(player.attack_field))
+        #     print(str(player.id) + "'s defence field: " + str(player.defence_field))
+
+        # print(self.deck)
+
     def __repr__(self):
         '''
         Returns the representation of the entire model at the current state.
         '''
-        return "---------STATE----------\n"\
-            +"Deck: " + str(self.deck)\
-                + "\n\nPlayers: " + str(self.players)\
-                    + "\n\nAttack fields: " + str(self.attack_fields)\
-                        + "\n------------------------"
+        return "Deck: " +
+         str(self.deck) + "\n\nPlayers: " + str(self.players) + "\n\nAttack fields: " + str(self.attack_fields)
+
 
 
     def step(self):
@@ -66,52 +76,13 @@ class DurakModel(Model):
         self.schedule.step()
 
 
-    def return_winning_card(self, card1, card2):
+    def compare_cards(self, card1, card2):
         '''
-        Compares two cards and returns the highest card or a tie
+        Compares two cards and returns the highest
         '''
-        value1 = self.deck.values.index(card1.get_value())
-        suit1_trump = card1.get_suit() == self.deck.get_trump_suit()
-        value2 = self.deck.values.index(card2.get_value())
-        suit2_trump = card2.get_suit() == self.deck.get_trump_suit()
-
-        if suit1_trump:
-            if suit2_trump:
-                if value1 > value2:
-                    return card1
-                else:
-                    return card2
-            else:
-                return card1
-        else:
-            if suit2_trump:
-                return card2
-            else:
-                if value1 > value2:
-                    return card1
-                elif value1 < value2:
-                    return card2
-                else:
-                    return "tie"
-
-
-def play(m):
-    '''
-    Play a game of Durak until there is a winner
-
-    :param m: The model to play the game with
-    '''
-    
-    while not m.deck.is_empty():
-
-        print(m)
-        m.step()
-        # Currently stops with an error b/c winning conditions still need to be implemented
-
 
 
 
 m = DurakModel()
-play(m)
-
-# print(m.return_winning_card(m.players[0].hand.get_cards_in_hand()[0], m.players[1].hand.get_cards_in_hand()[0]))
+print(m)
+m.step()
