@@ -16,11 +16,11 @@ class Deck():
         :param num_suits: The number of suits in the deck
         :param num_cards_per_suit: The number of cards from each suit
         '''
-        
+
         self.values = []
         self.suits = []
         self.deck = []
-        self.trump_suit = "HEARTS"
+        self.trump_suit = ""
 
         # Create a deck of the right size, and determine the ranking order of the cards
         for i in range(num_suits):
@@ -31,6 +31,9 @@ class Deck():
         
         # Shuffle the deck
         self.shuffle()
+
+        # Set the trump card
+        self.trump_suit = self.deck[0].get_suit()
 
 
     def __repr__(self):

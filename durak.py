@@ -112,6 +112,8 @@ def play(m):
 
 
 m = DurakModel()
+print(m.deck.trump_suit)
+print(m)
 play(m)
 
 # print(m.return_winning_card(m.players[0].hand.get_cards_in_hand()[0], m.players[1].hand.get_cards_in_hand()[0]))
