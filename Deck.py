@@ -34,6 +34,7 @@ class Deck():
 
         # Set the trump card
         self.trump_suit = self.deck[0].get_suit()
+        self.trump_card = self.deck[0]
 
 
     def __repr__(self):
@@ -73,6 +74,12 @@ class Deck():
         Returns the trump suit of this game.
         '''
         return self.trump_suit
+
+    def get_trump_card(self):
+        '''
+        Returns the trump card of this game.
+        '''
+        return self.trump_card
 
 
     def get_card_at_location(self, index):
