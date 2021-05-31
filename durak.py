@@ -95,10 +95,12 @@ class DurakModel(Model):
 
         self.schedule.step(self.current_attacker.id, self.current_defender.id)
 
-        ## Common Knowledge of Attack Field Content Comes in Here
+        ## Common Knowledge of Attack Field (attack and defend) Content Comes in Here
         for list_of_cards in self.attack_fields:
-            for card in list_of_cards.cards:
+            for card in list_of_cards.get_attacking_cards():
                 self.add_common_knowledge(card, "attack")
+            for card in list_of_cards.get_defending_cards():
+                self.add_common_knowledge(card, "defend")
 
 
     def add_common_knowledge(self, card, position): # position is "deck", "attack", "defend", or "discard" (maybe players as well?)
