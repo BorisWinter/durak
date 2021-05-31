@@ -33,7 +33,9 @@ class Player(Agent):
     def update_knowledge_own_hand(self):
         # step 1: the agent KNOWS its own hand
         for card in self.hand.get_cards_in_hand():
-            self.private_knowledge.append(KnowledgeFact("K", self.id, card, self.id))
+            knowledge = KnowledgeFact("K", self.id, card, self.id)
+            if knowledge not in self.private_knowledge:
+                self.private_knowledge.append(knowledge)
 
 
 

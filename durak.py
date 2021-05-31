@@ -51,6 +51,7 @@ class DurakModel(Model):
             for player in self.players:
                 player.receive_card(self.deck.deal())
 
+        # players know what card they have in their own hand
         for player in self.players:
             player.update_knowledge_own_hand()
 
