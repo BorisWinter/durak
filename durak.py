@@ -160,15 +160,27 @@ class DurakModel(Model):
             # Defender gets the cards if attacker wins
             for attack_card in attack_cards:
                 defender.receive_card(attack_card)
+
+                self.add_common_knowledge(attack_card, defender.id) # add common knowledge that cards go to loser
+
             for defend_card in defence_cards:
                 defender.receive_card(defend_card)
+
+                self.add_common_knowledge(defend_card, defender.id)
+
+
+
             print("Player " + str(attacker_key) + " won! The cards go to player " + str(defender_key))
         else:
             # Discard pile gets the cards otherwise
             for attack_card in attack_cards:
                 self.discard_pile.add_card(attack_card)
+                self.add_common_knowledge(attack_card, "discard")
+
             for defend_card in defence_cards:
                 self.discard_pile.add_card(defend_card)
+                self.add_common_knowledge(defend_card, "discard")   # maybe put this in a function
+
             print("Player " + str(defender_key) + " won! The cards go to the discard pile!")
         
         # Clear the attack field
