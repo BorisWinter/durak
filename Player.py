@@ -29,7 +29,7 @@ class Player(Agent):
         # The agent's step will go here.
         # For demonstration purposes we will print the agent's unique_id
         # print ("Hi, I am player " + str(self.unique_id) +".")
-        self.attack(random.choice(self.hand.get_cards_in_hand()))
+        self.attack()
 
 
     def receive_card(self, card):
@@ -39,19 +39,38 @@ class Player(Agent):
         self.hand.add_card(card)
 
     
-    def attack(self, card):
+    def attack(self):
         '''
-        Attack with the specified card
+        Choose a card and attack with it.
         '''
+
+        # Pick a card
+        card = random.choice(self.hand.get_cards_in_hand())
+
+        # Play the card
         if card in self.hand.get_cards_in_hand():
-            self.attack_field.add_card(card)
+            self.attack_field.add_attack_card(card)
             self.hand.remove_card(card)
 
+        # Print an attack statement
+        print("Player " + str(self.id) + " attacked with the " + str(card))
 
-    def defend(self, card):
+
+    def defend(self):
         '''
-        Defend with the specified card
+        Choose a card and defend with it.
         '''
-        if card in self.hand.get_cards_in_hand():
-            self.defence_field.add_card(card)
-            self.hand.remove_card(card)
+
+        # Choose a card to defend against
+        attacking_card = random.choice(self.defence_field.get_attacking_cards())
+
+        # Pick a card from your hand to defend with
+        defending_card = random.choice(self.hand.get_cards_in_hand())
+
+        # Play the card
+        if defending_card in self.hand.get_cards_in_hand():
+            self.defence_field.add_defence_card(attacking_card, defending_card)
+            self.hand.remove_card(defending_card)
+
+        # Print a defence statement
+        print("Player " + str(self.id) + " defended with the " + str(defending_card))
