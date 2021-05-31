@@ -12,8 +12,8 @@ class DurakModel(Model):
         self, 
         num_players = 3,
         num_suits = 3,
-        num_cards_per_suit = 2,
-        num_starting_cards = 1):
+        num_cards_per_suit = 3,
+        num_starting_cards = 2):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -37,6 +37,9 @@ class DurakModel(Model):
             self.players.append(player)
             self.schedule.add(player)
 
+        # Create Common Knowledge
+        self.common_knowledge = []
+
         # Create the discard pile
         self.discard_pile = []
 
@@ -54,17 +57,31 @@ class DurakModel(Model):
         Returns the representation of the entire model at the current state.
         '''
         return "---------STATE----------\n"\
-            +"Deck: " + str(self.deck)\
-                + "\n\nPlayers: " + str(self.players)\
-                    + "\n\nAttack fields: " + str(self.attack_fields)\
-                        + "\n------------------------"
+            +"Deck: " + str(self.deck) \
+               + "\n\nCommon Knowledge: " + str(self.common_knowledge) \
+                    + "\n\nPlayers: " + str(self.players)\
+                        + "\n\nAttack fields: " + str(self.attack_fields)\
+                            + "\n------------------------"
 
 
     def step(self):
         '''
         Advance the model by one step.
         '''
+
+
+        ## Common Knowledge of Attack Field Content Comes in Here
+
+        for list_of_cards in self.attack_fields:
+            for card in list_of_cards.cards:
+                self.add_common_knowledge(card, "attack")
+
         self.schedule.step()
+
+
+    def add_common_knowledge(self, card, position): # position is "deck", "attack", "defend", or "discard" (maybe players as well?)
+        self.common_knowledge.append(KnowledgeFact("C", None, card, position))
+
 
 
     def return_winning_card(self, card1, card2):
@@ -103,13 +120,9 @@ def play(m):
     :param m: The model to play the game with
     '''
 
-    print("TRUMP CARD", m.deck.get_trump_card())
     #one-off action: trump card is common knowledge
-    for player in m.players:
-        player.knowledge.append(KnowledgeFact("C", player.id, m.deck.get_trump_card(), "deck"))
+    m.add_common_knowledge(m.deck.get_trump_card(), "deck")
 
-
-    
     while not m.deck.is_empty():
 
         print(m)

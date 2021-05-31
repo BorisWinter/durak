@@ -15,7 +15,8 @@ class Player(Agent):
         self.hand = Hand(self.id)
         self.attack_field = attack_fields[self.id]
         self.defence_field = attack_fields[(self.id - 1) % num_players]
-        self.knowledge = self.initial_knowledge()
+        self.private_knowledge = self.initial_knowledge()
+        self.common_knowledge = []
 
 
 
@@ -23,19 +24,16 @@ class Player(Agent):
         '''
         Returns the representation of the player.
         '''
-        return "\n Player " + str(self.id) + "\n\t Hand : " + str(self.hand) + "\n\t Knowledge : " + str(self.knowledge)
+        return "\n Player " + str(self.id) + "\n\t Hand : " + str(self.hand) + "\n\t Knowledge : " + str(self.private_knowledge)
 
     def initial_knowledge(self):
         return []    # will be an empty list for initialization
 
-    def update_knowledge(self):
+    def update_knowledge_own_hand(self):
         # step 1: the agent KNOWS its own hand
-        #print("updating knowledge")
         for card in self.hand.get_cards_in_hand():
-            self.knowledge.append(KnowledgeFact("K", self.id, card, self.id))
+            self.private_knowledge.append(KnowledgeFact("K", self.id, card, self.id))
 
-        #print("agent "+str(self.id)+" has knowledge")
-        #print(self.knowledge)
 
 
     def step(self):
@@ -46,9 +44,10 @@ class Player(Agent):
         # print ("Hi, I am player " + str(self.unique_id) +".")
 
 
-        self.update_knowledge()
+        self.update_knowledge_own_hand()
 
         self.attack(random.choice(self.hand.get_cards_in_hand()))
+
 
 
     def receive_card(self, card):
