@@ -40,6 +40,11 @@ class CustomStagedActivation(BaseScheduler):
         """
         # agent_keys = list(self._agents.keys())
 
+        # get current private of knowledge of own hand
+        for players in self._agents:
+            getattr(self._agents[players], "update_knowledge_own_hand")()  # Run stage
+
+
         # Attack stage
         getattr(self._agents[current_attacker_key], "attack")()  # Run stage
         

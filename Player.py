@@ -24,10 +24,11 @@ class Player(Agent):
         '''
         Returns the representation of the player.
         '''
-        return "\n Player " + str(self.id) + "\n\t Hand : " + str(self.hand) + "\n\t Knowledge : " + str(self.private_knowledge)
+        return "\n Player " + str(self.id) + "\n\t Hand : " + str(self.hand) + "\n\t Knowledge : " +\
+               str(self.private_knowledge)
 
     def initial_knowledge(self):
-        return []    # will be an empty list for initialization
+        return []
 
     def update_knowledge_own_hand(self):
         # step 1: the agent KNOWS its own hand
@@ -42,7 +43,6 @@ class Player(Agent):
         # The agent's step will go here.
         # For demonstration purposes we will print the agent's unique_id
         # print ("Hi, I am player " + str(self.unique_id) +".")
-
 
         self.update_knowledge_own_hand()
 

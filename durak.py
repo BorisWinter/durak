@@ -13,7 +13,7 @@ class DurakModel(Model):
         num_players = 3,
         num_suits = 3,
         num_cards_per_suit = 3,
-        num_starting_cards = 2):
+        num_starting_cards = 1):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -51,9 +51,18 @@ class DurakModel(Model):
             for player in self.players:
                 player.receive_card(self.deck.deal())
 
+        for player in self.players:
+            player.update_knowledge_own_hand()
+
         # Select starting attacker TODO: Change to player with lowest suit
         self.current_attacker = self.players[0]
         self.current_defender = self.players[1]
+
+        # one-off action: trump card is common knowledge
+        self.add_common_knowledge(self.deck.get_trump_card(), "deck")
+
+        # get current private of knowledge of own hand
+
 
     def __repr__(self):
         '''
@@ -80,19 +89,19 @@ class DurakModel(Model):
 
 
 
-        ## Common Knowledge of Attack Field Content Comes in Here
 
+
+
+        self.schedule.step(self.current_attacker.id, self.current_defender.id)
+
+        ## Common Knowledge of Attack Field Content Comes in Here
         for list_of_cards in self.attack_fields:
             for card in list_of_cards.cards:
                 self.add_common_knowledge(card, "attack")
 
 
-        self.schedule.step(self.current_attacker.id, self.current_defender.id)
-
-
-
     def add_common_knowledge(self, card, position): # position is "deck", "attack", "defend", or "discard" (maybe players as well?)
-        self.common_knowledge.append(KnowledgeFact("C", None, card, position))
+        self.common_knowledge.append(KnowledgeFact("C", "", card, position))
 
 
 
@@ -132,8 +141,7 @@ def play(m):
     :param m: The model to play the game with
     '''
 
-    #one-off action: trump card is common knowledge
-    m.add_common_knowledge(m.deck.get_trump_card(), "deck")
+
 
     # while not m.deck.is_empty():
     m.step()
