@@ -17,8 +17,6 @@ class CustomStagedActivation(BaseScheduler):
         self,
         model,
         stage_list = None,
-        shuffle: bool = False,
-        shuffle_between_stages: bool = False,
     ) -> None:
         """Create an empty Staged Activation schedule.
 
@@ -34,21 +32,23 @@ class CustomStagedActivation(BaseScheduler):
         """
         super().__init__(model)
         self.stage_list = ["step"] if not stage_list else stage_list
-        self.shuffle = shuffle
-        self.shuffle_between_stages = shuffle_between_stages
-        self.stage_time = 1 / len(self.stage_list)
+        self.stage_time = 1 / len(self.stage_list) #TODO: Make sure the time matches with the stages
 
+    def step(self, current_attacker_key, current_defender_key) -> None:
+        """ 
+        Executes all the stages for all agents. 
+        """
+        # agent_keys = list(self._agents.keys())
 
-    def step(self) -> None:
-        """ Executes all the stages for all agents. """
-        agent_keys = list(self._agents.keys())
-        if self.shuffle:
-            self.model.random.shuffle(agent_keys)
-        for stage in self.stage_list:
-            for agent_key in agent_keys:
-                getattr(self._agents[agent_key], stage)()  # Run stage
-            if self.shuffle_between_stages:
-                self.model.random.shuffle(agent_keys)
-            self.time += self.stage_time
+        # Attack stage
+        getattr(self._agents[current_attacker_key], "attack")()  # Run stage
+        
+
+        # Update knowledge stage
+
+        # Defence stage
+        getattr(self._agents[current_defender_key], "defend")()  # Run stage
+
+        self.time += self.stage_time # Update time after each stage
 
         self.steps += 1

@@ -25,7 +25,7 @@ class DurakModel(Model):
         self.attack_fields = []
         self.num_players = num_players
         self.num_starting_cards = num_starting_cards
-        self.schedule = CustomStagedActivation(self) #TODO: Create the activation stages based on the game
+        self.schedule = CustomStagedActivation(self)
 
         for i in range(self.num_players):
             # Create the attack fields
@@ -51,6 +51,9 @@ class DurakModel(Model):
             for player in self.players:
                 player.receive_card(self.deck.deal())
 
+        # Select starting attacker TODO: Change to player with lowest suit
+        self.current_attacker = self.players[0]
+        self.current_defender = self.players[1]
 
     def __repr__(self):
         '''
@@ -58,16 +61,23 @@ class DurakModel(Model):
         '''
         return "---------STATE----------\n"\
             +"Deck: " + str(self.deck) \
-               + "\n\nCommon Knowledge: " + str(self.common_knowledge) \
-                    + "\n\nPlayers: " + str(self.players)\
+                + "\nTrump suit: " + self.deck.trump_suit \
+                + "\n\nCommon Knowledge: " + str(self.common_knowledge) \
+                + "\n\nPlayers: " + str(self.players)\
                         + "\n\nAttack fields: " + str(self.attack_fields)\
                             + "\n------------------------"
 
 
     def step(self):
         '''
-        Advance the model by one step.
+        Advance the model by one step. In each step, the following happens:
+        1. The current attacking player attacks
+        2. The players update their knowledge.
+        3. The current defending player defends.
+        4. The attack is resolved and a winner is determined or the next attacker is chosen.
+        5. The players update their knowledge.
         '''
+
 
 
         ## Common Knowledge of Attack Field Content Comes in Here
@@ -76,7 +86,9 @@ class DurakModel(Model):
             for card in list_of_cards.cards:
                 self.add_common_knowledge(card, "attack")
 
-        self.schedule.step()
+
+        self.schedule.step(self.current_attacker.id, self.current_defender.id)
+
 
 
     def add_common_knowledge(self, card, position): # position is "deck", "attack", "defend", or "discard" (maybe players as well?)
@@ -123,17 +135,17 @@ def play(m):
     #one-off action: trump card is common knowledge
     m.add_common_knowledge(m.deck.get_trump_card(), "deck")
 
-    while not m.deck.is_empty():
+    # while not m.deck.is_empty():
+    m.step()
+    print(m)
 
-        print(m)
-        m.step()
-        # Currently stops with an error b/c winning conditions still need to be implemented
+
+    # Currently stops with an error b/c winning conditions still need to be implemented
 
 
 
 
 m = DurakModel()
-print("Trump suit:", m.deck.trump_suit)
 print("Starting state...")
 print(m)
 print("Play! ")
