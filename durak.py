@@ -5,6 +5,7 @@ from Player import Player
 from Deck import Deck
 from DiscardPile import DiscardPile
 from KnowledgeFact import KnowledgeFact
+from Inference import Inference
 
 class DurakModel(Model):
     """A model for the game of Durak with some number of players."""
@@ -14,7 +15,7 @@ class DurakModel(Model):
         num_players = 3,
         num_suits = 3,
         num_cards_per_suit = 3,
-        num_starting_cards = 1):
+        num_starting_cards = 2):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -27,6 +28,7 @@ class DurakModel(Model):
         self.num_players = num_players
         self.num_starting_cards = num_starting_cards
         self.schedule = CustomStagedActivation(self)
+        self.inference_engine = Inference()
 
         for i in range(self.num_players):
             # Create the attack fields
@@ -91,12 +93,7 @@ class DurakModel(Model):
         '''
         self.schedule.step(self, self.current_attacker.id, self.current_defender.id)
 
-        ## Common Knowledge of Attack Field (attack and defend) Content Comes in Here
-        for list_of_cards in self.attack_fields:
-            for card in list_of_cards.get_attacking_cards():
-                self.add_common_knowledge(card, "attack")
-            for card in list_of_cards.get_defending_cards():
-                self.add_common_knowledge(card, "defend")
+
 
 
     def add_common_knowledge(self, card, position): # position is "deck", "attack", "defend", or "discard" (maybe players as well?)

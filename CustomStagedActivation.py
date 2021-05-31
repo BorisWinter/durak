@@ -61,6 +61,18 @@ class CustomStagedActivation(BaseScheduler):
             getattr(self._agents[agent_key], "update_knowledge_own_hand")()
         self.time += self.stage_time
 
+        # 6. We do inference in the inference engine
+        model.inference_engine.inference_for_players(model)
+        self.time += self.stage_time
+
+
+
+
+
+
+
+
+
 
         
 
