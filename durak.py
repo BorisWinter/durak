@@ -13,7 +13,7 @@ class DurakModel(Model):
         self, 
         num_players = 3,
         num_suits = 3,
-        num_cards_per_suit = 2,
+        num_cards_per_suit = 3,
         num_starting_cards = 1):
         '''
         Initialize the game
@@ -38,6 +38,9 @@ class DurakModel(Model):
             self.players.append(player)
             self.schedule.add(player)
 
+        # Create Common Knowledge
+        self.common_knowledge = []
+
         # Create the discard pile
         self.discard_pile = DiscardPile()
 
@@ -49,9 +52,18 @@ class DurakModel(Model):
             for player in self.players:
                 player.receive_card(self.deck.deal())
 
+        # players know what card they have in their own hand
+        for player in self.players:
+            player.update_knowledge_own_hand()
+
         # Select starting attacker TODO: Change to player with lowest suit
         self.current_attacker = self.players[0]
         self.current_defender = self.players[1]
+
+        # one-off action: trump card is common knowledge
+        self.add_common_knowledge(self.deck.get_trump_card(), "deck")
+
+        # get current private of knowledge of own hand
 
 
     def __repr__(self):
@@ -59,9 +71,10 @@ class DurakModel(Model):
         Returns the representation of the entire model at the current state.
         '''
         return "---------STATE----------\n"\
-            +"Deck: " + str(self.deck)\
-                + "\nTrump suit: " + self.deck.trump_suit\
-                    + "\n\nPlayers: " + str(self.players)\
+            +"Deck: " + str(self.deck) \
+                + "\nTrump suit: " + self.deck.trump_suit \
+                + "\n\nCommon Knowledge: " + str(self.common_knowledge) \
+                + "\n\nPlayers: " + str(self.players)\
                         + "\n\nAttack fields: " + str(self.attack_fields)\
                             + "\n\nDiscard pile: " + str(self.discard_pile)\
                                 + "\n------------------------"
@@ -77,6 +90,18 @@ class DurakModel(Model):
         5. The players update their knowledge.
         '''
         self.schedule.step(self, self.current_attacker.id, self.current_defender.id)
+
+        ## Common Knowledge of Attack Field (attack and defend) Content Comes in Here
+        for list_of_cards in self.attack_fields:
+            for card in list_of_cards.get_attacking_cards():
+                self.add_common_knowledge(card, "attack")
+            for card in list_of_cards.get_defending_cards():
+                self.add_common_knowledge(card, "defend")
+
+
+    def add_common_knowledge(self, card, position): # position is "deck", "attack", "defend", or "discard" (maybe players as well?)
+        self.common_knowledge.append(KnowledgeFact("C", "", card, position))
+
 
 
     def return_winning_card(self, card1, card2):
@@ -158,16 +183,12 @@ def play(m):
     :param m: The model to play the game with
     '''
 
-    print("TRUMP CARD", m.deck.get_trump_card())
-    #one-off action: trump card is common knowledge
-    for player in m.players:
-        player.knowledge.append(KnowledgeFact("C", player.id, m.deck.get_trump_card(), "deck"))
 
 
-    
     # while not m.deck.is_empty():
     m.step()
     print(m)
+
 
     # Currently stops with an error b/c winning conditions still need to be implemented
 

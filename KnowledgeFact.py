@@ -8,3 +8,6 @@ class KnowledgeFact:
 
     def __repr__(self):
         return self.operator + "_"+str(self.player) +" "+ str(self.card) + "_"+str(self.owner_card)
+
+    def __eq__(self, other):
+        return self.operator == other.operator and self.player == other.player and self.card == other.card and self.owner_card == other.owner_card

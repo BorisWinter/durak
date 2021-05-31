@@ -58,7 +58,7 @@ class CustomStagedActivation(BaseScheduler):
 
         # 5. Update the knowledge of all agents
         for agent_key in agent_keys:
-            getattr(self._agents[agent_key], "update_knowledge")()
+            getattr(self._agents[agent_key], "update_knowledge_own_hand")()
         self.time += self.stage_time
 
 
