@@ -38,6 +38,7 @@ class CustomStagedActivation(BaseScheduler):
         self.shuffle_between_stages = shuffle_between_stages
         self.stage_time = 1 / len(self.stage_list)
 
+
     def step(self) -> None:
         """ Executes all the stages for all agents. """
         agent_keys = list(self._agents.keys())

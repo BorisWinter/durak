@@ -3,6 +3,7 @@ from mesa import Model
 from CustomStagedActivation import CustomStagedActivation
 from Player import Player
 from Deck import Deck
+from KnowledgeFact import KnowledgeFact
 
 class DurakModel(Model):
     """A model for the game of Durak with some number of players."""
@@ -11,8 +12,8 @@ class DurakModel(Model):
         self, 
         num_players = 3,
         num_suits = 3,
-        num_cards_per_suit = 3,
-        num_starting_cards = 2):
+        num_cards_per_suit = 2,
+        num_starting_cards = 1):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -101,6 +102,13 @@ def play(m):
 
     :param m: The model to play the game with
     '''
+
+    print("TRUMP CARD", m.deck.get_trump_card())
+    #one-off action: trump card is common knowledge
+    for player in m.players:
+        player.knowledge.append(KnowledgeFact("C", player.id, m.deck.get_trump_card(), "deck"))
+
+
     
     while not m.deck.is_empty():
 
