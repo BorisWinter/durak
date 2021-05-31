@@ -47,3 +47,10 @@ class AttackField():
         :param card: The card that should be added to the field
         '''
         self.cards[attacking_card]  = defending_card
+
+    
+    def clear(self):
+        '''
+        Clears the field
+        '''
+        self.cards.clear()

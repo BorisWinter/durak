@@ -51,6 +51,13 @@ class Player(Agent):
         self.attack()
 
 
+    def get_attack_field(self):
+        '''
+        Returns the attack field of this player
+        '''
+        return self.attack_field
+
+
     def receive_card(self, card):
         '''
         Adds the specified card to the hand of the player

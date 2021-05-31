@@ -3,6 +3,7 @@ from mesa import Model
 from CustomStagedActivation import CustomStagedActivation
 from Player import Player
 from Deck import Deck
+from DiscardPile import DiscardPile
 from KnowledgeFact import KnowledgeFact
 
 class DurakModel(Model):
@@ -38,7 +39,7 @@ class DurakModel(Model):
             self.schedule.add(player)
 
         # Create the discard pile
-        self.discard_pile = []
+        self.discard_pile = DiscardPile()
 
         # Create the deck and shuffle it
         self.deck = Deck(num_suits, num_cards_per_suit)
@@ -52,6 +53,7 @@ class DurakModel(Model):
         self.current_attacker = self.players[0]
         self.current_defender = self.players[1]
 
+
     def __repr__(self):
         '''
         Returns the representation of the entire model at the current state.
@@ -61,7 +63,8 @@ class DurakModel(Model):
                 + "\nTrump suit: " + self.deck.trump_suit\
                     + "\n\nPlayers: " + str(self.players)\
                         + "\n\nAttack fields: " + str(self.attack_fields)\
-                            + "\n------------------------"
+                            + "\n\nDiscard pile: " + str(self.discard_pile)\
+                                + "\n------------------------"
 
 
     def step(self):
@@ -73,7 +76,7 @@ class DurakModel(Model):
         4. The attack is resolved and a winner is determined or the next attacker is chosen.
         5. The players update their knowledge.
         '''
-        self.schedule.step(self.current_attacker.id, self.current_defender.id)
+        self.schedule.step(self, self.current_attacker.id, self.current_defender.id)
 
 
     def return_winning_card(self, card1, card2):
@@ -104,6 +107,49 @@ class DurakModel(Model):
                 else:
                     return "tie"
 
+
+    def resolve_attack(self, attacker_key, defender_key):
+        '''
+        Resolve the attack from the given attacker.
+
+        :param attacker: The attacker in the attack
+        '''
+        attacker = self.players[attacker_key]
+        defender = self.players[defender_key]
+        field = attacker.get_attack_field()
+        attack_cards = field.get_attacking_cards()
+        defence_cards = field.get_defending_cards()
+        attacker_wins = False
+
+        # The attacker wins if the defender cannot place enough cards or if they defeat one of the defender's cards
+        if len(attack_cards) > len(defence_cards):
+            attacker_wins = True
+        elif len(attack_cards) < len(defence_cards):
+            print("ERROR: Defender placed more cards than attacker.")
+        else:
+            for i, attack_card in enumerate(attack_cards):
+                if self.return_winning_card(attack_card, defence_cards[i]) == attack_card:
+                    attacker_wins = True
+        
+        if attacker_wins:
+            # Defender gets the cards if attacker wins
+            for attack_card in attack_cards:
+                defender.receive_card(attack_card)
+            for defend_card in defence_cards:
+                defender.receive_card(defend_card)
+            print("Player " + str(attacker_key) + " won! The cards go to player " + str(defender_key))
+        else:
+            # Discard pile gets the cards otherwise
+            for attack_card in attack_cards:
+                self.discard_pile.add_card(attack_card)
+            for defend_card in defence_cards:
+                self.discard_pile.add_card(defend_card)
+            print("Player " + str(defender_key) + " won! The cards go to the discard pile!")
+        
+        # Clear the attack field
+        field.clear()
+       
+                
 
 def play(m):
     '''

@@ -34,21 +34,34 @@ class CustomStagedActivation(BaseScheduler):
         self.stage_list = ["step"] if not stage_list else stage_list
         self.stage_time = 1 / len(self.stage_list) #TODO: Make sure the time matches with the stages
 
-    def step(self, current_attacker_key, current_defender_key) -> None:
+    def step(self, model, current_attacker_key, current_defender_key) -> None:
         """ 
         Executes all the stages for all agents. 
         """
-        # agent_keys = list(self._agents.keys())
+        agent_keys = list(self._agents.keys())
 
-        # Attack stage
-        getattr(self._agents[current_attacker_key], "attack")()  # Run stage
+        # 1. Attack stage
+        getattr(self._agents[current_attacker_key], "attack")()
+        self.time += self.stage_time
+
+        # 2. Knowledge update stage
+        getattr(self._agents[current_defender_key], "update_knowledge_own_hand")()
+        self.time += self.stage_time
+
+        # 3. Defence stage
+        getattr(self._agents[current_defender_key], "defend")()
+        self.time += self.stage_time
+
+        # 4. Resolve attack stage
+        model.resolve_attack(current_attacker_key, current_defender_key)
+        self.time += self.stage_time
+
+        # 5. Update the knowledge of all agents
+        for agent_key in agent_keys:
+            getattr(self._agents[agent_key], "update_knowledge")()
+        self.time += self.stage_time
+
+
         
-
-        # Update knowledge stage
-
-        # Defence stage
-        getattr(self._agents[current_defender_key], "defend")()  # Run stage
-
-        self.time += self.stage_time # Update time after each stage
 
         self.steps += 1
