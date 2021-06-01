@@ -68,13 +68,13 @@ class Player(Agent):
     
     def attack(self):
         '''
-        Choose a card and attack with it.
+        Choose on or more cards and attack with them.
         '''
 
-        # Pick a card
+        # Pick one ore more cards TODO: Make it so that multiple cards can be played
         card = random.choice(self.hand.get_cards_in_hand())
 
-        # Play the card
+        # Play the card(s)
         if card in self.hand.get_cards_in_hand():
             self.attack_field.add_attack_card(card)
             self.hand.remove_card(card)

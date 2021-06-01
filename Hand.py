@@ -18,6 +18,16 @@ class Hand():
         Returns the representation of the hand.
         '''
         return str(self.cards)
+
+
+    def is_empty(self):
+        '''
+        Returns True if the hand is empty and False otherwise.
+        '''
+        if self.cards:
+            return False
+        else:
+            return True
         
 
     def get_cards_in_hand(self):

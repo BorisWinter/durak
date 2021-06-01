@@ -24,6 +24,8 @@ class DurakModel(Model):
         :param num_starting_cards: The number of cards that each player starts with
         '''
         self.players = []
+        self.winners = []
+        self.durak = None
         self.attack_fields = []
         self.num_players = num_players
         self.num_starting_cards = num_starting_cards
@@ -75,11 +77,12 @@ class DurakModel(Model):
         return "---------STATE----------\n"\
             +"Deck: " + str(self.deck) \
                 + "\nTrump suit: " + self.deck.trump_suit \
-                + "\n\nCommon Knowledge: " + str(self.common_knowledge) \
-                + "\n\nPlayers: " + str(self.players)\
-                        + "\n\nAttack fields: " + str(self.attack_fields)\
-                            + "\n\nDiscard pile: " + str(self.discard_pile)\
-                                + "\n------------------------"
+                    + "\n\nCommon Knowledge: " + str(self.common_knowledge) \
+                        + "\n\nWinners: " + str(self.winners)\
+                            + "\n\nPlayers: " + str(self.players)\
+                                + "\n\nAttack fields: " + str(self.attack_fields)\
+                                    + "\n\nDiscard pile: " + str(self.discard_pile)\
+                                        + "\n------------------------"
 
 
     def step(self):
@@ -154,21 +157,18 @@ class DurakModel(Model):
                     attacker_wins = True
         
         if attacker_wins:
+            print("Player " + str(attacker_key) + " won! The cards go to player " + str(defender_key))
             # Defender gets the cards if attacker wins
             for attack_card in attack_cards:
                 defender.receive_card(attack_card)
-
                 self.add_common_knowledge(attack_card, defender.id) # add common knowledge that cards go to loser
 
             for defend_card in defence_cards:
                 defender.receive_card(defend_card)
-
                 self.add_common_knowledge(defend_card, defender.id)
 
-
-
-            print("Player " + str(attacker_key) + " won! The cards go to player " + str(defender_key))
         else:
+            print("Player " + str(defender_key) + " won! The cards go to the discard pile!")
             # Discard pile gets the cards otherwise
             for attack_card in attack_cards:
                 self.discard_pile.add_card(attack_card)
@@ -178,7 +178,36 @@ class DurakModel(Model):
                 self.discard_pile.add_card(defend_card)
                 self.add_common_knowledge(defend_card, "discard")   # maybe put this in a function
 
-            print("Player " + str(defender_key) + " won! The cards go to the discard pile!")
+        if self.deck.is_empty():
+            # Check if the attacking player has won the game
+            if attacker.hand.is_empty():
+                print("Player " + str(attacker_key) + " has won the game!!")
+                self.winners.append(attacker)
+                self.players.remove(attacker)
+
+                # TODO: Make the attack fields match the new situation
+
+                # Check if the game is over
+                if len(self.players) == 1:
+                    self.durak = defender
+        
+            # Check if the defending player has won the game
+            if defender.hand.is_empty():
+                print("Player " + str(defender_key) + " has won the game!!")
+                self.winners.append(defender)
+                self.players.remove(defender)
+
+                # TODO: Make the attack fields match the new situation
+
+                # Check if the game is over
+                if len(self.players) == 1:
+                    self.durak = attacker
+
+        
+        # Determine who's turn it is now !Take into account that attacker might have won
+        # if attacker_wins:
+        #     if not attacker.hand.is_empty():
+        #         self.current_attacker = len(self.players)
         
         # Clear the attack field
         field.clear()
@@ -194,7 +223,7 @@ def play(m):
 
 
 
-    # while not m.deck.is_empty():
+    # while not m.durak:
     m.step()
     print(m)
 
