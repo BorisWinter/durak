@@ -1,4 +1,4 @@
-from KnowledgeFact import KnowledgeFact
+from KnowledgeFact import KnowledgeFact, KnowledgeDisjunct
 
 class Inference:
 
@@ -24,13 +24,14 @@ class Inference:
 
     def other_owns_card(self, card, other_player, knowledge):
         for fact in knowledge:
-            if fact.card == card:
-                #print(fact.card, fact.owner_card, other_player)
+            if type(fact) != KnowledgeDisjunct:
+                if fact.card == card:
+                    #print(fact.card, fact.owner_card, other_player)
 
-                if fact.owner_card == other_player:
-                    return True
-                else:
-                    return False
+                    if fact.owner_card == other_player:
+                        return True
+                    else:
+                        return False
 
     def from_C_to_K(self, common_knowledge, player):
         for fact in common_knowledge:
@@ -40,9 +41,20 @@ class Inference:
 
 
 
-    def do_inference(self, common_knowledge, private_knowledge, player, other, model):
 
+
+    def do_inference(self, common_knowledge, private_knowledge, player, other, model):
         new_knowledge = []
+        disjunct_deck = list(model.deck.initial_deck).copy()
+
+        for card in disjunct_deck:
+            if not self.other_owns_card(card, other, private_knowledge):
+                disjunct_deck.remove(card)
+
+
+        # todo intersect with the number of cards that an agent has in their hand?
+        player.private_knowledge.append(KnowledgeDisjunct("K", player.id, disjunct_deck, other))
+
         # all possible facts in disjunction?
         disjunct_other = []
         return new_knowledge

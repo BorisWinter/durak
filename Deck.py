@@ -32,7 +32,8 @@ class Deck():
         self.initial_deck = self.deck.copy()
 
         # Shuffle the deck
-        self.shuffle()
+
+        #self.shuffle() ###-> turned off for debugging
 
 
         # Set the trump card
