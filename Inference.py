@@ -53,6 +53,8 @@ class Inference:
 
 
         # todo intersect with the number of cards that an agent has in their hand?
+        # todo: does not take handlimit into account (yet)#
+        # probably inefficient as heelll
         player.private_knowledge.append(KnowledgeDisjunct("K", player.id, disjunct_deck, other))
 
         # all possible facts in disjunction?
