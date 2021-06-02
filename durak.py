@@ -14,8 +14,8 @@ class DurakModel(Model):
         self, 
         num_players = 3,
         num_suits = 3,
-        num_cards_per_suit = 3,
-        num_starting_cards = 2):
+        num_cards_per_suit = 2,
+        num_starting_cards = 1):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -50,6 +50,7 @@ class DurakModel(Model):
 
         # Create the deck and shuffle it
         self.deck = Deck(num_suits, num_cards_per_suit)
+
 
         # Deal
         for i in range(self.num_starting_cards):

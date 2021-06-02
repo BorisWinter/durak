@@ -11,3 +11,5 @@ class KnowledgeFact:
 
     def __eq__(self, other):
         return self.operator == other.operator and self.player == other.player and self.card == other.card and self.owner_card == other.owner_card
+
+

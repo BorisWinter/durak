@@ -28,9 +28,12 @@ class Deck():
                 self.deck.append(Card(Deck.AVAILABLE_SUITS[i], Deck.AVAILABLE_VALUES[j]))
                 self.values.append(Deck.AVAILABLE_VALUES[j])
                 self.suits.append(Deck.AVAILABLE_SUITS[i])
-        
+
+        self.initial_deck = self.deck.copy()
+
         # Shuffle the deck
         self.shuffle()
+
 
         # Set the trump card
         self.trump_suit = self.deck[0].get_suit()

@@ -1,3 +1,5 @@
+from KnowledgeFact import KnowledgeFact
+
 class Inference:
 
     def __init__(self):
@@ -20,15 +22,46 @@ class Inference:
         
         '''
 
+    def other_owns_card(self, card, other_player, knowledge):
+        for fact in knowledge:
+            if fact.card == card:
+                #print(fact.card, fact.owner_card, other_player)
 
-    def do_inference(self, common_knowledge, private_knowledge):
+                if fact.owner_card == other_player:
+                    return True
+                else:
+                    return False
+
+    def from_C_to_K(self, common_knowledge, player):
+        for fact in common_knowledge:
+            if fact not in player.private_knowledge:
+                player.private_knowledge.append(KnowledgeFact("K", player.id, fact.card, fact.owner_card))
+
+
+
+
+    def do_inference(self, common_knowledge, private_knowledge, player, other, model):
+
         new_knowledge = []
-        print("inference magic here")
+        # all possible facts in disjunction?
+        disjunct_other = []
         return new_knowledge
 
 
     def inference_for_players(self, model):
+        print("inference magic here (under construction)")
+
         common_knowledge = model.common_knowledge
         for player in model.players:
             private_knowledge = player.private_knowledge
-            self.do_inference(common_knowledge, private_knowledge)
+            player_id = player.id
+
+            # reason from common knowledge:
+            self.from_C_to_K(common_knowledge, player)
+
+
+
+            # reason about other agents
+            for other_player in model.players:
+                if other_player.id != player.id:    # other player
+                    self.do_inference(common_knowledge, private_knowledge, player, other_player.id, model)
