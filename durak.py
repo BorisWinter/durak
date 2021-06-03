@@ -14,8 +14,8 @@ class DurakModel(Model):
         self, 
         num_players = 3,
         num_suits = 3,
-        num_cards_per_suit = 2,
-        num_starting_cards = 2):
+        num_cards_per_suit = 3,
+        num_starting_cards = 1):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -221,6 +221,15 @@ class DurakModel(Model):
                 # Check if the game is over
                 if len(self.players) == 1:
                     self.durak = attacker
+
+
+        # Take cards if needed
+        num_cards_attacker = len(attacker.hand.get_cards_in_hand())
+        num_cards_defender = len(defender.hand.get_cards_in_hand())
+        if num_cards_attacker < self.num_starting_cards:
+            attacker.take_cards_from_deck(self, self.num_starting_cards - num_cards_attacker)
+        if num_cards_defender < self.num_starting_cards:
+            defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
 
         
         # Determine who's turn it is now

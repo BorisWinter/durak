@@ -157,3 +157,12 @@ class Player(Agent):
 
         # Print a defence statement
         print("Player " + str(self.id) + " defended with the " + str(defending_card))
+
+    
+    def take_cards_from_deck(self, model, num):
+        """
+        Take a given number of cards from the deck in the hand.
+        """
+        for i in range(num):
+            if not model.deck.is_empty():
+                self.hand.add_card(model.deck.deal())
