@@ -15,7 +15,7 @@ class DurakModel(Model):
         num_players = 3,
         num_suits = 3,
         num_cards_per_suit = 2,
-        num_starting_cards = 1):
+        num_starting_cards = 2):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -41,6 +41,11 @@ class DurakModel(Model):
             player = Player(i, self, self.attack_fields, self.num_players)
             self.players.append(player)
             self.schedule.add(player)
+
+        for player in self.players:
+            # Set the order of play
+            player.set_next_player(self.players[(player.get_id() + 1) % num_players])
+            player.set_previous_player(self.players[(player.get_id() - 1) % num_players])
 
         # Create Common Knowledge
         self.common_knowledge = []
@@ -95,7 +100,7 @@ class DurakModel(Model):
         4. The attack is resolved and a winner is determined or the next attacker is chosen.
         5. The players update their knowledge.
         '''
-        self.schedule.step(self, self.current_attacker.id, self.current_defender.id)
+        self.schedule.step(self, self.current_attacker, self.current_defender)
 
 
 
@@ -134,14 +139,14 @@ class DurakModel(Model):
                     return "tie"
 
 
-    def resolve_attack(self, attacker_key, defender_key):
+    def resolve_attack(self, attacker, defender):
         '''
         Resolve the attack from the given attacker.
 
         :param attacker: The attacker in the attack
         '''
-        attacker = self.players[attacker_key]
-        defender = self.players[defender_key]
+        # attacker = self.players[attacker_key]
+        # defender = self.players[defender_key]
         field = attacker.get_attack_field()
         attack_cards = field.get_attacking_cards()
         defence_cards = field.get_defending_cards()
@@ -158,7 +163,7 @@ class DurakModel(Model):
                     attacker_wins = True
         
         if attacker_wins:
-            print("Player " + str(attacker_key) + " won! The cards go to player " + str(defender_key))
+            print("Player " + str(attacker.get_id()) + " won! The cards go to player " + str(defender.get_id()))
             # Defender gets the cards if attacker wins
             for attack_card in attack_cards:
                 defender.receive_card(attack_card)
@@ -169,7 +174,7 @@ class DurakModel(Model):
                 self.add_common_knowledge(defend_card, defender.id)
 
         else:
-            print("Player " + str(defender_key) + " won! The cards go to the discard pile!")
+            print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
             # Discard pile gets the cards otherwise
             for attack_card in attack_cards:
                 self.discard_pile.add_card(attack_card)
@@ -182,33 +187,55 @@ class DurakModel(Model):
         if self.deck.is_empty():
             # Check if the attacking player has won the game
             if attacker.hand.is_empty():
-                print("Player " + str(attacker_key) + " has won the game!!")
+
+                # Make the attack fields match the new situation
+                defender.set_defence_field(attacker.get_defence_field())
+
+                # Make the turns match the new situation
+                attacker.get_previous_player().set_next_player(defender)
+                defender.set_previous_player(attacker.get_previous_player())
+
+                print("Player " + str(attacker.get_id()) + " has won the game!!")
                 self.winners.append(attacker)
                 self.players.remove(attacker)
 
-                # TODO: Make the attack fields match the new situation
-
                 # Check if the game is over
                 if len(self.players) == 1:
+                    print("Player " + str(defender.get_id()) + " has lost the game and is now the DURAK!!")
                     self.durak = defender
         
             # Check if the defending player has won the game
             if defender.hand.is_empty():
-                print("Player " + str(defender_key) + " has won the game!!")
+                print("Player " + str(defender.get_id()) + " has won the game!!")
+
+                # Make the attack fields match the new situation
+                attacker.set_attack_field(defender.get_attack_field())
+
+                # Make the turns match the new situation
+                attacker.set_next_player(defender.get_next_player())
+                defender.get_next_player().set_previous_player(attacker)
+
                 self.winners.append(defender)
                 self.players.remove(defender)
-
-                # TODO: Make the attack fields match the new situation
 
                 # Check if the game is over
                 if len(self.players) == 1:
                     self.durak = attacker
 
         
-        # Determine who's turn it is now !Take into account that attacker might have won
-        # if attacker_wins:
-        #     if not attacker.hand.is_empty():
-        #         self.current_attacker = len(self.players)
+        # Determine who's turn it is now
+        if attacker_wins:
+            self.current_attacker = defender.get_next_player()
+            self.current_defender = defender.get_next_player().get_next_player()
+            print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
+        else:
+            if defender.hand.is_empty():
+                self.current_attacker = defender.get_next_player()
+                self.current_defender = defender.get_next_player().get_next_player()
+            else:
+                self.current_attacker = defender
+                self.current_defender = defender.get_next_player()
+                print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
         
         # Clear the attack field
         field.clear()
@@ -224,9 +251,9 @@ def play(m):
 
 
 
-    # while not m.durak:
-    m.step()
-    print(m)
+    while not m.durak:
+        m.step()   
+        print(m)
 
 
     # Currently stops with an error b/c winning conditions still need to be implemented

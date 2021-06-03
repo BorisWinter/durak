@@ -52,11 +52,67 @@ class Player(Agent):
         self.attack()
 
 
+    def get_id(self):
+        '''
+        Returns the id of this player
+        '''
+        return self.id
+
+
+    def get_next_player(self):
+        '''
+        Returns the next player after this one
+        '''
+        return self.next_player
+
+
+    def set_next_player(self, player):
+        '''
+        Sets the next player after this one
+        '''
+        self.next_player = player
+
+
+    def get_previous_player(self):
+        '''
+        Returns the previous player
+        '''
+        return self.previous_player
+
+
+    def set_previous_player(self, player):
+        '''
+        Sets the previous player
+        '''
+        self.previous_player = player
+
+        
     def get_attack_field(self):
         '''
         Returns the attack field of this player
         '''
         return self.attack_field
+
+
+    def set_attack_field(self, field):
+        '''
+        Sets the attack field of this player
+        '''
+        self.attack_field = field
+
+
+    def get_defence_field(self):
+        '''
+        Returns the defence field of this player
+        '''
+        return self.defence_field
+
+
+    def set_defence_field(self, field):
+        '''
+        Sets the defence field of this player
+        '''
+        self.defence_field = field
 
 
     def receive_card(self, card):
