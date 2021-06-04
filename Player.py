@@ -1,7 +1,7 @@
 from AttackField import AttackField
 from mesa import Agent
 from Hand import Hand
-from KnowledgeFact import KnowledgeFact
+from KnowledgeFact import KnowledgeFact, KnowledgeDisjunct
 import random
 
 class Player(Agent):
@@ -16,6 +16,7 @@ class Player(Agent):
         self.attack_field = attack_fields[self.id]
         self.defence_field = attack_fields[(self.id - 1) % num_players]
         self.private_knowledge = self.initial_knowledge()
+        self.private_disjunct_knowledge = []
         self.common_knowledge = []
 
 
@@ -25,7 +26,34 @@ class Player(Agent):
         Returns the representation of the player.
         '''
         return "\n Player " + str(self.id) + "\n\t Hand : " + str(self.hand) + "\n\t Knowledge : " +\
-               str(self.private_knowledge)
+               str(self.private_knowledge) + "\n" + str(self.private_disjunct_knowledge)
+
+
+
+
+
+    def get_knowledge_about_other_player(self, other_player):
+        single_fact_list = []
+        disjunct_fact =  []
+        for fact in self.private_knowledge:
+            if fact.owner_card == other_player:
+                if type(fact.card) != int:
+                    single_fact_list.append(fact)
+        for fact in self.private_disjunct_knowledge:
+            if fact.owner_card == other_player:
+                disjunct_fact = fact
+
+        return single_fact_list, disjunct_fact
+
+    def get_private_single_knowledge_about_other_player(self, other_player):
+        single_fact_list = []
+        for fact in self.private_knowledge:
+            if fact.owner_card == other_player:
+                if type(fact.card) != int:
+                    single_fact_list.append(fact)
+
+
+        return single_fact_list
 
     def initial_knowledge(self):
         return []
