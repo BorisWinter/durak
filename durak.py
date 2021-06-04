@@ -232,7 +232,7 @@ class DurakModel(Model):
             defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
 
         
-        # Determine who's turn it is now
+        # Determine whose turn it is now
         if attacker_wins:
             self.current_attacker = defender.get_next_player()
             self.current_defender = defender.get_next_player().get_next_player()
