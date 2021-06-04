@@ -245,6 +245,7 @@ class DurakModel(Model):
 
 
         # Determine who's turn it is now
+
         if attacker_wins:
             self.current_attacker = defender.get_next_player()
             self.current_defender = defender.get_next_player().get_next_player()
