@@ -14,7 +14,7 @@ class DurakModel(Model):
         self, 
         num_players = 3,
         num_suits = 3,
-        num_cards_per_suit = 3,
+        num_cards_per_suit = 2,
         num_starting_cards = 1):
         '''
         Initialize the game
@@ -107,6 +107,9 @@ class DurakModel(Model):
 
     def add_common_knowledge(self, card, position): # position is "deck", "attack", "defend", or "discard" (maybe players as well?)
         self.common_knowledge.append(KnowledgeFact("C", "", card, position))
+
+    def add_common_knowledge_num(self, num, position): # every player knows how many cards are where
+        self.common_knowledge.append(KnowledgeFact("C", "", num, position))
 
 
 
@@ -231,7 +234,16 @@ class DurakModel(Model):
         if num_cards_defender < self.num_starting_cards:
             defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
 
-        
+        ## every player knows how many cards every player/location has
+        for player in self.players:
+            num = player.get_number_of_cards_in_hand()
+            player_id = player.id
+            self.add_common_knowledge_num(num, player_id)
+
+        self.add_common_knowledge_num(len(self.deck.deck), "deck") # the players also know the number of cards in a deck
+
+
+
         # Determine who's turn it is now
         if attacker_wins:
             self.current_attacker = defender.get_next_player()

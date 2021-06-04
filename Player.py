@@ -40,6 +40,9 @@ class Player(Agent):
 
 
 
+    def get_number_of_cards_in_hand(self):
+        return len(self.hand.cards)
+
     def step(self):
         '''
         '''
