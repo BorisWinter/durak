@@ -118,6 +118,9 @@ class DurakModel(Model):
                 to_remove.append(fact)
         return to_remove
 
+    def resolve_discard_pile(self):
+        pass
+
 
 
     def return_winning_card(self, card1, card2):
@@ -186,13 +189,26 @@ class DurakModel(Model):
         else:
             print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
             # Discard pile gets the cards otherwise
+            to_remove = []
+
             for attack_card in attack_cards:
                 self.discard_pile.add_card(attack_card)
+                for fact in self.common_knowledge:
+                    if fact.card == attack_card and fact.owner_card != "discard":
+                        to_remove.append(fact)
                 self.add_common_knowledge(attack_card, "discard")
 
             for defend_card in defence_cards:
                 self.discard_pile.add_card(defend_card)
+                for fact in self.common_knowledge:
+                    if fact.card == defend_card and fact.owner_card != "discard":
+                        to_remove.append(fact)
+
                 self.add_common_knowledge(defend_card, "discard")   # maybe put this in a function
+
+
+            for fact in to_remove:
+                self.common_knowledge.remove(fact)
 
         if self.deck.is_empty():
             # Check if the attacking player has won the game

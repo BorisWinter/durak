@@ -71,6 +71,7 @@ class Inference:
 
     def disjunct_elimination(self, common_knowledge, private_knowledge, player, other, model):
         for_sure_count = 0
+        print("common knowledge ", common_knowledge)
         print("\tthis is player ", player.id, " 's own hand ", player.hand)
         print("\tthis is player ", player.id, " 's knowledge about player ", other)
         for fact in common_knowledge:
@@ -109,12 +110,58 @@ class Inference:
         #print("inference magic here (under construction)")
 
         common_knowledge = model.common_knowledge
+
+        player_with_trump_card = "deck"
+
         for player in model.players:
             private_knowledge = player.private_knowledge
             player_id = player.id
 
+
+            if model.deck.is_empty():
+                # check for trump card
+                for fact in private_knowledge:
+                    if fact.card == model.deck.get_trump_card():
+                        print("in here with player ", player_id)
+                        player_with_trump_card = player_id
+
+                    # we know that a player has the trump card
+                    # and it should become common knowledge which player has the trump card.
+
+        # end condition: deck is empty
+        to_remove = []
+        if model.deck.is_empty():
+            for fact in common_knowledge:
+                if fact.card == model.deck.get_trump_card():
+                    if fact.owner_card == "deck" or fact.owner_card != player_with_trump_card:
+                        to_remove.append(fact)
+
+        for fact in to_remove:
+            common_knowledge.remove(fact)
+
+        if player_with_trump_card != "deck":
+            model.add_common_knowledge(model.deck.get_trump_card(), player_with_trump_card)
+
+        for player in model.players:
+            private_knowledge = player.private_knowledge
+            player_id = player.id
+
+
+
+
             # reason from common knowledge:
             self.from_C_to_K(common_knowledge, player)
+
+            # remove cards that are in the discard pile from knowledge list
+
+            to_remove = []
+            for fact in private_knowledge:
+                if fact.card in model.discard_pile.cards and fact.owner_card != "discard":
+                    to_remove.append(fact)
+            for item in to_remove:
+                player.private_knowledge.remove(item)
+
+
 
 
 
