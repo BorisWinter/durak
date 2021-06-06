@@ -111,6 +111,13 @@ class DurakModel(Model):
     def add_common_knowledge_num(self, num, position): # every player knows how many cards are where
         self.common_knowledge.append(KnowledgeFact("C", "", num, position))
 
+    def remove_old_hand_num_knowledge(self, knowledge):
+        to_remove = []
+        for fact in knowledge:
+            if type(fact.card) == int:  # BAD! REFACTOR!
+                to_remove.append(fact)
+        return to_remove
+
 
 
     def return_winning_card(self, card1, card2):
@@ -235,13 +242,25 @@ class DurakModel(Model):
             defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
 
         ## every player knows how many cards every player/location has
+        # first remove all old common knowledge about hand limit
+
+        common_to_remove = self.remove_old_hand_num_knowledge(self.common_knowledge)
+        for item in common_to_remove:
+            self.common_knowledge.remove(item)
+
+
+
         for player in self.players:
+            # remove knowledge about old hands from players
+            player_to_remove = self.remove_old_hand_num_knowledge(player.private_knowledge)
+            for item in player_to_remove:
+                player.private_knowledge.remove(item)
+
             num = player.get_number_of_cards_in_hand()
             player_id = player.id
             self.add_common_knowledge_num(num, player_id)
 
         self.add_common_knowledge_num(len(self.deck.deck), "deck") # the players also know the number of cards in a deck
-
 
 
         # Determine who's turn it is now
@@ -261,8 +280,9 @@ class DurakModel(Model):
         
         # Clear the attack field
         field.clear()
-       
-                
+
+
+
 
 def play(m):
     '''
@@ -279,7 +299,6 @@ def play(m):
 
 
     # Currently stops with an error b/c winning conditions still need to be implemented
-
 
 
 

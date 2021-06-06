@@ -23,15 +23,19 @@ class Inference:
         '''
 
     def other_owns_card(self, card, other_player, knowledge):
+        print(knowledge)
+        print(card)
         for fact in knowledge:
-            if type(fact) != KnowledgeDisjunct:
-                if fact.card == card:
-                    #print(fact.card, fact.owner_card, other_player)
+            if fact.card == card:
+                print("in here", fact.card)
+                print(fact.owner_card)
 
-                    if fact.owner_card == other_player:
-                        return True
-                    else:
-                        return False
+                if fact.owner_card == other_player:
+                    return True
+
+        return False
+
+
 
     def from_C_to_K(self, common_knowledge, player):
         for fact in common_knowledge:
@@ -44,28 +48,33 @@ class Inference:
 
 
     def do_inference(self, common_knowledge, private_knowledge, player, other, model):
-        new_knowledge = []
-        disjunct_deck = list(model.deck.initial_deck).copy()
-
-        for card in disjunct_deck:
-            if not self.other_owns_card(card, other, private_knowledge) and \
-                    not self.other_owns_card(card, player.id, private_knowledge):
-                disjunct_deck.remove(card)
+        disjunct_knowledge = []
+        full_deck = list(model.deck.initial_deck).copy()
 
 
-        # todo intersect with the number of cards that an agent has in their hand?
-        # todo: does not take handlimit into account (yet)#
+        ## get the possible cards in someone's hand ###
+        # a card can be in someone's hand if we don't
+        ## know for sure that it is in someone
+        # else's hand
+        for card in full_deck:
+            flag = 0
+            for fact in private_knowledge:  # TODO this can probably be done with sets more efficiently but don't want to work it out rn
+                if (fact.card == card):
+                    flag = 1    # we know something about this card
+                    if (fact.owner_card == other):  # if we know that the owner owns it, its ok
+                        disjunct_knowledge.append(card)  # if we know that someone else's owns it, it cant be owned by the other player.
+            if flag == 0:   # we don't know anything about this card, so it could be in the hand of the other player
+                disjunct_knowledge.append(card)
+
         # probably inefficient as heelll
-        player.private_disjunct_knowledge.append(KnowledgeDisjunct("K", player.id, disjunct_deck, other))
-
-        # all possible facts in disjunction?
-        disjunct_other = []
-        return new_knowledge
+        player.private_disjunct_knowledge.append(KnowledgeDisjunct("K", player.id, disjunct_knowledge, other))
 
     def disjunct_elimination(self, common_knowledge, private_knowledge, player, other, model):
         for_sure_count = 0
+        print("\tthis is player ", player.id, " 's own hand ", player.hand)
         print("\tthis is player ", player.id, " 's knowledge about player ", other)
         for fact in common_knowledge:
+            #print("FACT ", fact)
             if fact.owner_card == other and type(fact.card) == int: ### THIS IS BAD REFACTOR THIS LATER!
                 number_of_cards_of_other_player = fact.card
                 single_fact_other, disjunct_fact_other = player.get_knowledge_about_other_player(other)
@@ -97,7 +106,7 @@ class Inference:
 
 
     def inference_for_players(self, model):
-        print("inference magic here (under construction)")
+        #print("inference magic here (under construction)")
 
         common_knowledge = model.common_knowledge
         for player in model.players:
