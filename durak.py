@@ -164,6 +164,7 @@ class DurakModel(Model):
         attack_cards = field.get_attacking_cards()
         defence_cards = field.get_defending_cards()
         attacker_wins = False
+        to_remove = []
 
         # The attacker wins if the defender cannot place enough cards or if they defeat one of the defender's cards
         if len(attack_cards) > len(defence_cards):
@@ -180,26 +181,38 @@ class DurakModel(Model):
             # Defender gets the cards if attacker wins
             for attack_card in attack_cards:
                 defender.receive_card(attack_card)
+
+                for fact in self.common_knowledge:
+                    if fact.card == attack_card and fact.owner_card != defender.get_id():
+                        to_remove.append(fact)
+
                 self.add_common_knowledge(attack_card, defender.id) # add common knowledge that cards go to loser
 
             for defend_card in defence_cards:
                 defender.receive_card(defend_card)
-                self.add_common_knowledge(defend_card, defender.id)
+
+                for fact in self.common_knowledge:
+                    if fact.card == defend_card and fact.owner_card != defender.get_id():
+                        to_remove.append(fact)
+
+                #self.add_common_knowledge(defend_card, defender.id)
 
         else:
             print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
             # Discard pile gets the cards otherwise
-            to_remove = []
 
             for attack_card in attack_cards:
                 self.discard_pile.add_card(attack_card)
+
                 for fact in self.common_knowledge:
                     if fact.card == attack_card and fact.owner_card != "discard":
                         to_remove.append(fact)
+
                 self.add_common_knowledge(attack_card, "discard")
 
             for defend_card in defence_cards:
                 self.discard_pile.add_card(defend_card)
+
                 for fact in self.common_knowledge:
                     if fact.card == defend_card and fact.owner_card != "discard":
                         to_remove.append(fact)

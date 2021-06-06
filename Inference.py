@@ -22,18 +22,7 @@ class Inference:
         
         '''
 
-    def other_owns_card(self, card, other_player, knowledge):
-        print(knowledge)
-        print(card)
-        for fact in knowledge:
-            if fact.card == card:
-                print("in here", fact.card)
-                print(fact.owner_card)
 
-                if fact.owner_card == other_player:
-                    return True
-
-        return False
 
 
 
@@ -71,7 +60,6 @@ class Inference:
 
     def disjunct_elimination(self, common_knowledge, private_knowledge, player, other, model):
         for_sure_count = 0
-        print("common knowledge ", common_knowledge)
         print("\tthis is player ", player.id, " 's own hand ", player.hand)
         print("\tthis is player ", player.id, " 's knowledge about player ", other)
         for fact in common_knowledge:
@@ -113,6 +101,7 @@ class Inference:
 
         player_with_trump_card = "deck"
 
+
         for player in model.players:
             private_knowledge = player.private_knowledge
             player_id = player.id
@@ -122,7 +111,6 @@ class Inference:
                 # check for trump card
                 for fact in private_knowledge:
                     if fact.card == model.deck.get_trump_card():
-                        print("in here with player ", player_id)
                         player_with_trump_card = player_id
 
                     # we know that a player has the trump card
@@ -140,7 +128,11 @@ class Inference:
             common_knowledge.remove(fact)
 
         if player_with_trump_card != "deck":
-            model.add_common_knowledge(model.deck.get_trump_card(), player_with_trump_card)
+            card = model.deck.get_trump_card()
+            owner = player_with_trump_card
+            fact = KnowledgeFact("C", "", owner_card=owner, card=card)
+            if fact not in model.common_knowledge:
+                model.add_common_knowledge(model.deck.get_trump_card(), player_with_trump_card)
 
         for player in model.players:
             private_knowledge = player.private_knowledge
