@@ -40,7 +40,6 @@ class Inference:
         disjunct_knowledge = []
         full_deck = list(model.deck.initial_deck).copy()
 
-
         ## get the possible cards in someone's hand ###
         # a card can be in someone's hand if we don't
         ## know for sure that it is in someone

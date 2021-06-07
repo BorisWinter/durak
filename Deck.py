@@ -33,7 +33,7 @@ class Deck():
 
         # Shuffle the deck
 
-        #self.shuffle() ###-> turned off for debugging
+        self.shuffle() ###-> turned off for debugging
 
 
         # Set the trump card

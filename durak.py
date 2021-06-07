@@ -14,7 +14,7 @@ class DurakModel(Model):
         self, 
         num_players = 3,
         num_suits = 3,
-        num_cards_per_suit = 2,
+        num_cards_per_suit = 3,
         num_starting_cards = 1):
         '''
         Initialize the game
@@ -73,7 +73,6 @@ class DurakModel(Model):
         # one-off action: trump card is common knowledge
         self.add_common_knowledge(self.deck.get_trump_card(), "deck")
 
-        # get current private of knowledge of own hand
 
 
     def __repr__(self):
@@ -195,7 +194,7 @@ class DurakModel(Model):
                     if fact.card == defend_card and fact.owner_card != defender.get_id():
                         to_remove.append(fact)
 
-                #self.add_common_knowledge(defend_card, defender.id)
+                self.add_common_knowledge(defend_card, defender.id)
 
         else:
             print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
