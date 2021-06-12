@@ -2,6 +2,7 @@ from AttackField import AttackField
 from mesa import Agent
 from Hand import Hand
 from KnowledgeFact import KnowledgeFact, KnowledgeDisjunct
+import Moves
 import random
 
 class Player(Agent):
@@ -18,7 +19,6 @@ class Player(Agent):
         self.private_knowledge = self.initial_knowledge()
         self.private_disjunct_knowledge = []
         self.common_knowledge = []
-
 
 
     def __repr__(self):

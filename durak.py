@@ -157,8 +157,6 @@ class DurakModel(Model):
 
         :param attacker: The attacker in the attack
         '''
-        # attacker = self.players[attacker_key]
-        # defender = self.players[defender_key]
         field = attacker.get_attack_field()
         attack_cards = field.get_attacking_cards()
         defence_cards = field.get_defending_cards()
@@ -318,8 +316,6 @@ def play(m):
 
     :param m: The model to play the game with
     '''
-
-
 
     while not m.durak:
         m.step()   
