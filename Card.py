@@ -3,13 +3,13 @@ class Card():
     Models a card from a standard deck of cards
     """
 
-    def __init__(self, suit, value, ranking):
+    def __init__(self, suit, value):
         '''
         Initializes the card
         '''
         self.suit = suit
         self.value = value
-        self.ranking = ranking
+        self.ranking = -1
 
     def __repr__(self):
         '''
@@ -34,3 +34,9 @@ class Card():
         Returns the ranking of the card
         '''
         return self.ranking
+
+    def set_ranking(self, ranking):
+        '''
+        Sets the ranking of the card
+        '''
+        self.ranking = ranking

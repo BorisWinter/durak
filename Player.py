@@ -158,7 +158,7 @@ class Player(Agent):
         Choose on or more cards and attack with them.
         '''
 
-        # Pick one ore more cards TODO: Make it so that multiple cards can be played
+        # Choose a card to play
         card = random.choice(self.hand.get_cards_in_hand())
 
         # Play the card(s)

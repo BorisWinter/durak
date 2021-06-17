@@ -23,26 +23,25 @@ class Deck():
         self.ranking_order = []
         self.trump_suit = ""
 
+        # Create a deck of the right size
+        for i in range(num_suits):
+            for j in range(num_cards_per_suit):
+                self.deck.append(Card(Deck.AVAILABLE_SUITS[i], Deck.AVAILABLE_VALUES[j]))
+                self.values.append(Deck.AVAILABLE_VALUES[j])
+                self.suits.append(Deck.AVAILABLE_SUITS[i])
+
         # Set the trump card
         self.trump_suit = self.deck[0].get_suit()
         self.trump_card = self.deck[0]
 
-        # Create a deck of the right size
-        for i in range(num_suits):
-            for j in range(num_cards_per_suit):
-                # Determine the ranking of the to be added card
-                if Deck.AVAILABLE_SUITS[i] != self.trump_suit:
-                    card_ranking = j
+        # Set the ranking of the cards in the deck
+        for card in self.deck:
+                if card.get_suit() != self.trump_suit:
+                    card.set_ranking(self.values.index((card.get_value())))
                 else:
-                    card_ranking = num_cards_per_suit + j
-
-                self.deck.append(Card(Deck.AVAILABLE_SUITS[i], Deck.AVAILABLE_VALUES[j]), card_ranking)
-                self.values.append(Deck.AVAILABLE_VALUES[j])
-                self.suits.append(Deck.AVAILABLE_SUITS[i])
+                    card.set_ranking(num_cards_per_suit + self.values.index((card.get_value())))
 
         self.initial_deck = self.deck.copy()
-
-        
 
         # First add all non-trump cards to the ranking, then all trump cards
         # for i in range(num_cards_per_suit):
