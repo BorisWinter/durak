@@ -1,5 +1,4 @@
 from mlsolver.kripke import World, KripkeStructure
-from mlsolver.model import add_reflexive_edges, add_symmetric_edges
 import itertools
 
 
@@ -22,14 +21,14 @@ def gen_kripke(worlds, players):
     full_edges = set((x, x + 1) for x in range(0, len(worlds)))  # one way
     full_edges.update({(0, len(worlds)), (len(worlds), 0)})  # last and first
 
-    # Update with symmetric and reflexive edges. If needed,
-    # refer to mlsolver.model for functions that do this for entire set of relations.
+    # Update with symmetric and reflexive edges. If needed, refer to
+    # mlsolver.model for functions that do this for entire set of relations.
     full_edges.update(set((x, x - 1) for x in range(1, len(worlds) + 1)))  # symmetric
     full_edges.update(set((x, x) for x in range(0, len(worlds) + 1)))  # reflexive
 
     full_edges = sorted(full_edges)
     relations = {p: full_edges for p in players}
-    print(relations)
+    # print(relations)
 
     ks = KripkeStructure(worlds, relations)
     # print(ks.relations)
@@ -59,4 +58,4 @@ full_players = ['B', 'M', 'L', 'Deck', 'Discard']
 test_players = ['Hand', 'Deck', 'Discard']
 hand_players = ['B', 'M', 'L']
 
-gen_kripke(gen_worlds(full_cards, test_players), hand_players)
+gen_kripke(gen_worlds(full_cards, full_players), hand_players)
