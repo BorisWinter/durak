@@ -11,6 +11,7 @@ def gen_worlds(cards, players):
         w = World(str(i), d)
         # print(i, d)
         worlds.append(w)
+    # print(len(worlds))
 
     # Add all reflexive edges
     relations = set((x, x+1) for x in range(0, len(worlds)))
@@ -46,5 +47,5 @@ full_cards = ['2S', '2C', '2H', '3S', '3C', '3H', '4S', '4C', '4H']
 full_players = ['B', 'M', 'L', 'Deck', 'Discard']
 test_players = ['Hand', 'Deck', 'Discard']
 
-gen_worlds(full_cards, test_players)
+gen_worlds(full_cards, full_players)
 # demo()
