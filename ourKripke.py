@@ -16,9 +16,9 @@ def gen_worlds(cards, players):
     # Add all reflexive edges
     relations = set((x, x+1) for x in range(0, len(worlds)))
     relations.update(set((x, x-1) for x in range(1, len(worlds)+1)))
-    relations.update()
+    relations.update(set((x, x) for x in range(0, len(worlds)+1)))
     relations.update({(0, len(worlds)), (len(worlds), 0)})
-    # print(sorted(relations))
+    print(sorted(relations))
     ks = KripkeStructure(worlds, relations)
     # print(ks)
 
