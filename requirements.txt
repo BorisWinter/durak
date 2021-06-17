@@ -6,4 +6,5 @@
 Mesa == 0.8.7
 
 # durak/ourKripke.py: 1
-mlsolver == 0.0.0
+git+https://github.com/erohkohl/mlsolver.git#egg=mlsolver
+
