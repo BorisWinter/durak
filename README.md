@@ -9,7 +9,7 @@ Analyzing the Russian card game of Durak using epistemic logic.
 Practically, this main game consists of classes AttackField, Card, Deck, DiscardPile, Hand, and Player, and the main program ```durak.py```. The logical aspects of the game are represented in classes Inference and KnowledgeFact.
 
 ## Installation and run
-To install all required packages (so far only mesa), run:
+To install all required packages, run:
 ```
 pip install -r requirements.txt
 ```
