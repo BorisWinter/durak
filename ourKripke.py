@@ -1,4 +1,6 @@
 from mlsolver.kripke import World, KripkeStructure
+from mlsolver.model import add_symmetric_edges, add_reflexive_edges
+from mlsolver.formula import *
 import itertools
 
 
@@ -35,20 +37,38 @@ def gen_kripke(worlds, players):
     return ks
 
 
-# Quick demo of how the mlsolver library works.
+# Quick demo of how the mlsolver library works, doubles as scratch code.
 def demo():
     worlds = [
         World('1', {'p': True, 'q': True}),
         World('2', {'p': True, 'q': False}),
         World('3', {'p': False, 'q': True})
     ]
-
-    relations = {('1', '2'), ('2', '1'), ('1', '3'), ('3', '3')}
-    print(type(relations))
+    relations = {'A': {('1', '2'), ('2', '1'), ('1', '3'), ('3', '1'), ('1', '1'), ('2', '2'), ('3', '3')},
+                 'B': {('1', '3'), ('3', '1'), ('1', '1'), ('3', '3')}}
     ks = KripkeStructure(worlds, relations)
-    # print(ks.worlds)
-    # print(ks.relations)
     print(ks)
+
+    ## In this model, all worlds with "neg p" are removed,
+    ## and so are all edges to and from those worlds.
+    # print("---------------Box--------------")
+    # print(ks.solve(Atom('p')))
+    # print(ks.solve(Box_a('A', Atom('p'))))
+    # print(ks.solve(Box_a('B', Atom('p'))))
+
+    ## Some more tests
+    # print("---------------Diamond--------------")
+    # print(ks.solve(Diamond_a('A', Atom('p'))))
+    # print(ks.solve(Diamond_a('B', Atom('p'))))
+
+    ## A cleaner but slower way of writing these
+    # formula = Diamond_a('2', Atom('p'))
+    # new_ks = ks.solve(formula)
+    # print(new_ks)
+
+    # This only shows the list of worlds in which the
+    # formula does not work, TODO might be useful.
+    print(ks.nodes_not_follow_formula(Atom('p')))
 
 
 full_numbers = ['2', '3', '4']
@@ -58,4 +78,5 @@ full_players = ['B', 'M', 'L', 'Deck', 'Discard']
 test_players = ['Hand', 'Deck', 'Discard']
 hand_players = ['B', 'M', 'L']
 
-gen_kripke(gen_worlds(full_cards, full_players), hand_players)
+# gen_kripke(gen_worlds(full_cards, full_players), hand_players)
+demo()
