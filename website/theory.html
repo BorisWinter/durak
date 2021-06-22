@@ -61,17 +61,24 @@
 
 									<p>Relations between our worlds are indistinguishability relations. Given the
 										features of Durak,
-									our model must have the following properties:</p>
+									our model must have the following properties, as illustrated by the simplest
+										Kripke Model below:</p>
+
+									<span class="image object"><img src="images/simplestModel.jpeg" alt="" /></span>
+
 
 									<u1>
-									<li> <b>Reflexive: </b>	A player cannot distinguish a world from itself.</li>
-									<li> <b>Symmetric: </b>	If a player can't distinguish world A from world B, it cannot do so in the reverse either.</li>
-									<li> <b>Transitive: </b> If a player cannot distinguish world A from world B,
-										and not world B from world C, then they can't distinguish A from C either.</li>
+									<li> <b>Reflexive: </b>	No player candistinguish a world from itself.</li>
+									<li> <b>Symmetric: </b>	Player A can't distinguish world 1 from world 2, as A only has
+									access to its own hand. In world 2, A should still consider world 1 possible. Hence,
+									symmetric relations between worlds.</li>
+									<li> <b>Transitive: </b> If player A cannot distinguish world 1 from world 2,
+										and not world 2 from world 3, then they can't distinguish 1 from 3 either.</li>
 
 									<u1>
 
-										<p> These properties imply that our model is an S5 model.</p>
+										<p> These properties imply that our model is an S5 model. Hence, we
+										can use S5 inference rules in our model.</p>
 
 									<h2>First Order Knowledge </h2>
 									<p> First Order Knowledge is the first level of knowledge that we
