@@ -17,36 +17,32 @@ def gen_worlds(cards, players):
     return worlds
 
 
-# Given all worlds, generates a Kripke model.
-# TODO used for development
+# Given all worlds, generates a fully connected Kripke model.
 def gen_kripke(worlds, players):
-    full_edges = set((x, x + 1) for x in range(0, len(worlds)))  # one way
-    full_edges.update({(0, len(worlds)), (len(worlds), 0)})  # last and first
+    w = list(itertools.product(worlds, repeat=2))
+    full_edges = set()
+    for (w1, w2) in w:
+        full_edges.update({(w1.name, w2.name)})
 
-    # Update with symmetric and reflexive edges. If needed, refer to
-    # mlsolver.model for functions that do this for entire set of relations.
-    full_edges.update(set((x, x - 1) for x in range(1, len(worlds) + 1)))  # symmetric
-    full_edges.update(set((x, x) for x in range(0, len(worlds) + 1)))  # reflexive
-
-    # full_edges = sorted(full_edges)
     relations = {p: full_edges for p in players}
+    reachable = {p: [world.name for world in worlds] for p in players}
     # print(relations)
 
     ks = KripkeStructure(worlds, relations)
     # print(ks.relations)
-    return ks
+    return ks, reachable
 
 
-# Given all worlds, generates a Kripke model.
-# TODO if this version is used, the line "if str(w1) ... in to_remove" should be changed
+# Given all worlds, generates a Kripke model. # TODO used for development
 def gen_str_kripke(worlds, players):
-    full_edges = set((str(x), str(x + 1)) for x in range(0, len(worlds)))  # one way
-    full_edges.update({('0', str(len(worlds))), (str(len(worlds)), '0')})  # last and first
+    name_count_worlds = len(worlds) - 1  # Naming starts at 0
+    full_edges = set((str(x), str(x + 1)) for x in range(0, name_count_worlds))  # one way
+    full_edges.update({('0', str(name_count_worlds)), (str(name_count_worlds), '0')})  # last and first
 
     # Update with symmetric and reflexive edges. If needed, refer to
     # mlsolver.model for functions that do this for entire set of relations.
-    full_edges.update(set((str(x), str(x - 1)) for x in range(1, len(worlds) + 1)))  # symmetric
-    full_edges.update(set((str(x), str(x)) for x in range(0, len(worlds) + 1)))  # reflexive
+    full_edges.update(set((str(x), str(x - 1)) for x in range(1, name_count_worlds + 1)))  # symmetric
+    full_edges.update(set((str(x), str(x)) for x in range(0, name_count_worlds + 1)))  # reflexive
 
     # full_edges = set(sorted(full_edges))
     relations = {p: full_edges for p in players}
@@ -92,47 +88,92 @@ def demo():
 
 # Remove all links for the given player to and/or from
 # worlds in which the given statement is false.
-def remove_link(ks, player, statement):
-    to_remove = ks.nodes_not_follow_formula(Atom(statement))
-    if len(to_remove) > 40:
-        print("Number of worlds from/to which to remove relations:", len(to_remove))
-    else:
-        print("Worlds from/to which to remove relations:", to_remove)
+def remove_links(ks, player, statement, reachable):
+    print("Removing links...")
+    worlds_to_remove = ks.nodes_not_follow_formula(statement)
+    print("\t Number of worlds from/to which to remove relations:", len(worlds_to_remove))
+    if len(worlds_to_remove) < 20:
+        print("\t Worlds from/to which to remove relations:", worlds_to_remove)
 
-    relations = ks.relations.get(player)  # Passed by ref, ie changes to 'relations' affect the model relations!
-    print("Original number of worlds:", len(relations))
+    relations = ks.relations[player]  # Passed by ref, ie changes to 'relations' affect the model relations!
+    print("\t Original number of relations:", len(relations))
     links_to_remove = []
     for (w1, w2) in relations:
-        if str(w1) in to_remove or str(w2) in to_remove:
+        if w1 in worlds_to_remove or w2 in worlds_to_remove:
             links_to_remove.append((w1, w2))  # Necessary because Python sets are annoying
-    print("Number of relations to remove:", len(links_to_remove))
+    print("\t Number of relations to remove:", len(links_to_remove))
     relations -= set(links_to_remove)
 
-    if len(relations) > 40:
-        print("Updated number of relations:", len(relations))
-    else:
-        print("Updated relations: ", sorted(relations))  # This is a list, not a set! Used for development
+    print("\t Updated number of relations:", len(relations))
+    if len(relations) < 50:
+        print("\t Updated relations as sorted list: ", sorted(relations))  # Used for development
 
-    if relations != ks.relations.get(player):
-        raise PassByRefError("Model is not updated properly")
+    reachable[player] = [w for w in reachable[player] if w not in worlds_to_remove]
 
-    return ks
+    return ks, reachable
+
+
+# Add all links for the given player to and/or from
+# worlds in which the given statement is true.
+def add_links(ks, player, statement, reachable):
+    print("Adding links...")
+
+    worlds_to_add = ks.nodes_not_follow_formula(statement)
+    print("\t Number of worlds from/to which to add relations:", len(worlds_to_add))
+    if len(worlds_to_add) < 20:
+        print("\t Worlds from/to which to add relations:", worlds_to_add)
+
+    other_worlds = reachable[player]
+    if len(other_worlds) < 50:
+        print("\t Other worlds", other_worlds)
+
+    new_reachable = list(set(other_worlds+worlds_to_add))
+    links_to_add = list(itertools.product(new_reachable, repeat=2))
+    # Above also includes reflexivity in other_worlds, but that is solved by using sets
+
+    print("\t Number of relations to add (incl. already there):", len(links_to_add))
+    if len(links_to_add) < 20:
+        print("\t Relations to add (incl. already there):", links_to_add)
+    ks.relations[player].update(set(links_to_add))
+    relations = ks.relations[player]
+
+    print("\t Updated number of relations:", len(relations))
+    if len(relations) < 50:
+        print("\t Updated relations as sorted list: ", sorted(relations))  # Used for development
+
+    reachable[player] = list(set(reachable[player]+worlds_to_add))
+
+    return ks, reachable
 
 
 full_cards = ['2S', '2C', '2H', '3S', '3C', '3H', '4S', '4C', '4H']
 full_players = ['B', 'M', 'L', 'Deck', 'Discard']
 hand_players = ['B', 'M', 'L']
 
+k_m, reachable_worlds = gen_kripke(gen_worlds(full_cards, full_players), hand_players)
+print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
+print("Number of reachable worlds for B:", len(reachable_worlds['B']))
 
-# Development sets
+
+# Development sets etc.
 full_numbers = ['2', '3', '4']
 full_suits = ['S', 'C', 'H']
-test_cards = ['2S', '2C', '2H']
-test_players = ['Hand', 'Deck', 'Discard']
+test_cards = ['2S', '2C']
+test_players = ['B', 'Deck']
+test_hand_players = ['B']
 
+# k_m, reachable_worlds = gen_kripke(gen_worlds(test_cards, test_players), test_hand_players)
+# print("Reachable:", reachable_worlds)
+# print("Full model:", k_m)
+# test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+# test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
 
-k_m = gen_kripke(gen_worlds(full_cards, full_players), hand_players)
-test_removed = remove_link(k_m, 'B', 'B2S')
-
-# demo()
-# k_m = gen_kripke(gen_worlds(test_cards, full_players), hand_players)
+# def card_move(all_players, from_player, to_player, card, ks, reachable):
+#     for p in all_players:
+#         fuller_model, reachable = add_links(ks, p, Atom(to_player + card), reachable)
+#         final_model, reachable = remove_links(fuller_model, p, Atom(from_player + card), reachable)
+#
+# card_move(test_hand_players, 'B', 'B', '2S', k_m, reachable_worlds)
