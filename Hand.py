@@ -93,6 +93,7 @@ class Hand():
         '''
         Return the lowest card from the player's hand that beats the given card, if there is one.
         '''
+        return_card = None
         options = self.get_cards_in_hand()
         for card in options:
             if card.get_ranking() < return_card.get_ranking() and card.get_ranking() >= attacking_card.get_ranking():
@@ -107,6 +108,7 @@ class Hand():
         '''
         Return the lowest card from the player's hand that beats the given card, if there is one.
         '''
+        return_card = None
         options = self.get_cards_in_hand()
         for card in options:
             if card.get_ranking() < return_card.get_ranking() and card.get_ranking() >= defending_card.get_ranking():
