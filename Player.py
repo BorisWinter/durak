@@ -167,7 +167,8 @@ class Player(Agent):
             self.hand.remove_card(card)
 
         # Print an attack statement
-        print("Player " + str(self.id) + " attacked with the " + str(card))
+        if self.model.verbose:
+            print("Player " + str(self.id) + " attacked with the " + str(card))
 
 
     def defend(self):
@@ -187,7 +188,8 @@ class Player(Agent):
             self.hand.remove_card(defending_card)
 
         # Print a defence statement
-        print("Player " + str(self.id) + " defended with the " + str(defending_card))
+        if self.model.verbose:
+            	print("Player " + str(self.id) + " defended with the " + str(defending_card))
 
     
     def take_cards_from_deck(self, model, num):

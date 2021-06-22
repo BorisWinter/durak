@@ -2,8 +2,10 @@ from KnowledgeFact import KnowledgeFact, KnowledgeDisjunct
 
 class Inference:
 
-    def __init__(self):
-        print("todo")
+    def __init__(self, verbose):
+        self.verbose = verbose
+        if self.verbose:
+            print("todo")
         '''
         for each player, reason
         with common knowledge combined with
@@ -59,18 +61,20 @@ class Inference:
 
     def disjunct_elimination(self, common_knowledge, private_knowledge, player, other, model):
         for_sure_count = 0
-        print("\tthis is player ", player.id, " 's own hand ", player.hand)
-        print("\tthis is player ", player.id, " 's knowledge about player ", other)
+        if self.verbose:
+            print("\tthis is player ", player.id, " 's own hand ", player.hand)
+            print("\tthis is player ", player.id, " 's knowledge about player ", other)
         for fact in common_knowledge:
             #print("FACT ", fact)
             if fact.owner_card == other and type(fact.card) == int: ### THIS IS BAD REFACTOR THIS LATER!
                 number_of_cards_of_other_player = fact.card
                 single_fact_other, disjunct_fact_other = player.get_knowledge_about_other_player(other)
 
-                print("\tplayer ", player.id, " knows that player ", other, " has ", number_of_cards_of_other_player, " cards")
+                if self.verbose:
+                    print("\tplayer ", player.id, " knows that player ", other, " has ", number_of_cards_of_other_player, " cards")
 
-                print("\tplayer ", player.id, " knows this for sure about player ", other, single_fact_other)
-                print("\tplayer ", player.id, " considers these cards to be possible in ", other, " 's hand ", disjunct_fact_other)
+                    print("\tplayer ", player.id, " knows this for sure about player ", other, single_fact_other)
+                    print("\tplayer ", player.id, " considers these cards to be possible in ", other, " 's hand ", disjunct_fact_other)
 
                 if type(disjunct_fact_other) == KnowledgeDisjunct:
                     player.private_disjunct_knowledge.remove(disjunct_fact_other)
@@ -82,15 +86,16 @@ class Inference:
 
 
                     if for_sure_count < number_of_cards_of_other_player:
-                        print("\tplayer ", player.id, " is doubting between ", disjunct_fact_other.card_list, " in ", other, " 's hand ")
+                        if self.verbose:
+                            print("\tplaye  r ", player.id, " is doubting between ", disjunct_fact_other.card_list, " in ", other, " 's hand ")
                         player.private_disjunct_knowledge.append(KnowledgeDisjunct("K", player.id, disjunct_fact_other.card_list, other)) # if we still have doubts we append
                         # here we know that we've eliminated everything
                         # we know for sure what the other one has
                     else:
-                        print("\tplayer ", player.id, " knows for sure that ", player.get_private_single_knowledge_about_other_player(other), " in ", other, " 's hand ")
+                        if self.verbose:
+                            print   ("\tplayer ", player.id, " knows for sure that ", player.get_private_single_knowledge_about_other_player(other), " in ", other, " 's hand ")
 
 
-        print()
 
 
     def inference_for_players(self, model):

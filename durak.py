@@ -15,7 +15,10 @@ class DurakModel(Model):
         num_players = 3,
         num_suits = 3,
         num_cards_per_suit = 3,
-        num_starting_cards = 1):
+        num_starting_cards = 1,
+        player_strategies = ["random", "random", "random"], 
+        player_depths = [1,1,1],
+        verbose = False):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -24,13 +27,18 @@ class DurakModel(Model):
         :param num_starting_cards: The number of cards that each player starts with
         '''
         self.players = []
+        self.player_strategies = []
+        self.player_depths = []
         self.winners = []
         self.durak = None
         self.attack_fields = []
         self.num_players = num_players
+        self.num_suits = num_suits
+        self.num_cards_per_suit = num_cards_per_suit
         self.num_starting_cards = num_starting_cards
         self.schedule = CustomStagedActivation(self)
-        self.inference_engine = Inference()
+        self.inference_engine = Inference(verbose)
+        self.verbose = verbose
 
         for i in range(self.num_players):
             # Create the attack fields
@@ -174,7 +182,8 @@ class DurakModel(Model):
                     attacker_wins = True
         
         if attacker_wins:
-            print("Player " + str(attacker.get_id()) + " won! The cards go to player " + str(defender.get_id()))
+            if self.verbose:
+                print("Player " + str(attacker.get_id()) + " won! The cards go to player " + str(defender.get_id()))
             # Defender gets the cards if attacker wins
             for attack_card in attack_cards:
                 defender.receive_card(attack_card)
@@ -195,7 +204,8 @@ class DurakModel(Model):
                 self.add_common_knowledge(defend_card, defender.id)
 
         else:
-            print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
+            if self.verbose:
+                print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
             # Discard pile gets the cards otherwise
 
             for attack_card in attack_cards:
@@ -231,18 +241,21 @@ class DurakModel(Model):
                 attacker.get_previous_player().set_next_player(defender)
                 defender.set_previous_player(attacker.get_previous_player())
 
-                print("Player " + str(attacker.get_id()) + " has won the game!!")
+                if self.verbose:
+                    print("Player " + str(attacker.get_id()) + " has won the game!!")
                 self.winners.append(attacker)
                 self.players.remove(attacker)
 
                 # Check if the game is over
                 if len(self.players) == 1:
-                    print("Player " + str(defender.get_id()) + " has lost the game and is now the DURAK!!")
+                    if self.verbose:
+                        print("Player " + str(defender.get_id()) + " has lost the game and is now the DURAK!!")
                     self.durak = defender
-        
+
             # Check if the defending player has won the game
             if defender.hand.is_empty():
-                print("Player " + str(defender.get_id()) + " has won the game!!")
+                if self.verbose:
+                    print("Player " + str(defender.get_id()) + " has won the game!!")
 
                 # Make the attack fields match the new situation
                 attacker.set_attack_field(defender.get_attack_field())
@@ -258,43 +271,64 @@ class DurakModel(Model):
                 if len(self.players) == 1:
                     self.durak = attacker
 
+        else:
+            # Take cards if needed
+            num_cards_attacker = len(attacker.hand.get_cards_in_hand())
+            num_cards_defender = len(defender.hand.get_cards_in_hand())
+            if num_cards_attacker < self.num_starting_cards:
+                attacker.take_cards_from_deck(self, self.num_starting_cards - num_cards_attacker)
 
-        # Take cards if needed
-        num_cards_attacker = len(attacker.hand.get_cards_in_hand())
-        num_cards_defender = len(defender.hand.get_cards_in_hand())
-        if num_cards_attacker < self.num_starting_cards:
-            attacker.take_cards_from_deck(self, self.num_starting_cards - num_cards_attacker)
-        if num_cards_defender < self.num_starting_cards:
-            defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
+            # After the attacker has taken enough cards, check if the deck is now empty and the defender has won
+            if self.deck.is_empty():
+                if defender.hand.is_empty():
+                    if self.verbose:
+                        print("Player " + str(defender.get_id()) + " has won the game!!")
 
-        ## every player knows how many cards every player/location has
-        # first remove all old common knowledge about hand limit
+                    # Make the attack fields match the new situation
+                    attacker.set_attack_field(defender.get_attack_field())
 
-        common_to_remove = self.remove_old_hand_num_knowledge(self.common_knowledge)
-        for item in common_to_remove:
-            self.common_knowledge.remove(item)
+                    # Make the turns match the new situation
+                    attacker.set_next_player(defender.get_next_player())
+                    defender.get_next_player().set_previous_player(attacker)
+
+                    self.winners.append(defender)
+                    self.players.remove(defender)
+
+                    # Check if the game is over
+                    if len(self.players) == 1:
+                        self.durak = attacker
+
+            if num_cards_defender < self.num_starting_cards:
+                defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
+
+            ## every player knows how many cards every player/location has
+            # first remove all old common knowledge about hand limit
+
+            common_to_remove = self.remove_old_hand_num_knowledge(self.common_knowledge)
+            for item in common_to_remove:
+                self.common_knowledge.remove(item)
 
 
 
-        for player in self.players:
-            # remove knowledge about old hands from players
-            player_to_remove = self.remove_old_hand_num_knowledge(player.private_knowledge)
-            for item in player_to_remove:
-                player.private_knowledge.remove(item)
+            for player in self.players:
+                # remove knowledge about old hands from players
+                player_to_remove = self.remove_old_hand_num_knowledge(player.private_knowledge)
+                for item in player_to_remove:
+                    player.private_knowledge.remove(item)
 
-            num = player.get_number_of_cards_in_hand()
-            player_id = player.id
-            self.add_common_knowledge_num(num, player_id)
+                num = player.get_number_of_cards_in_hand()
+                player_id = player.id
+                self.add_common_knowledge_num(num, player_id)
 
-        self.add_common_knowledge_num(len(self.deck.deck), "deck") # the players also know the number of cards in a deck
+            self.add_common_knowledge_num(len(self.deck.deck), "deck") # the players also know the number of cards in a deck
 
 
         # Determine who's turn it is now
-
         if attacker_wins:
             self.current_attacker = defender.get_next_player()
             self.current_defender = defender.get_next_player().get_next_player()
-            print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
+            if self.verbose:
+                print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
         else:
             if defender.hand.is_empty():
                 self.current_attacker = defender.get_next_player()
@@ -302,10 +336,29 @@ class DurakModel(Model):
             else:
                 self.current_attacker = defender
                 self.current_defender = defender.get_next_player()
-                print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
+                if self.verbose:
+                    print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
         
         # Clear the attack field
         field.clear()
+
+
+    def get_game_data(self):
+        '''
+        Returns the current state of the game.
+        '''
+        game_state = {
+            "num_players" : self.num_players,
+            "num_suits" : self.num_suits,
+            "num_cards_per_suit" : self.num_cards_per_suit,
+            "num_starting_cards" : self.num_starting_cards,
+            "durak" : self.durak.get_id(),
+            "winners" : [winner.get_id() for winner in self.winners],
+    	    "player_strategies" : self.player_strategies,
+            "player_depths" : self.player_depths
+        }
+
+        return game_state
 
 
 
@@ -319,17 +372,21 @@ def play(m):
 
     while not m.durak:
         m.step()   
-        print(m)
+        # print(m)
+    
+    return m.get_game_data()
 
 
     # Currently stops with an error b/c winning conditions still need to be implemented
 
 
 
-m = DurakModel()
-print("Starting state...")
-print(m)
-print("Play! ")
-play(m)
+# m = DurakModel()
+# print("Starting state...")
+# print(m)
+# print("Play! ")
+# play(m)
 
 # print(m.return_winning_card(m.players[0].hand.get_cards_in_hand()[0], m.players[1].hand.get_cards_in_hand()[0]))
+
+
