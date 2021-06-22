@@ -54,7 +54,9 @@ class CustomStagedActivation(BaseScheduler):
         self.time += self.stage_time
 
         # 4. Resolve attack stage
-        model.resolve_attack(attacker, defender)
+        durak = model.resolve_attack(attacker, defender)
+        if durak:
+            self.model.set_durak(durak)
         self.time += self.stage_time
 
         # 5. Update the knowledge of all agents

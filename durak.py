@@ -164,6 +164,8 @@ class DurakModel(Model):
         Resolve the attack from the given attacker.
 
         :param attacker: The attacker in the attack
+
+        Returns the Durak if there is one, else None
         '''
         field = attacker.get_attack_field()
         attack_cards = field.get_attacking_cards()
@@ -250,7 +252,7 @@ class DurakModel(Model):
                 if len(self.players) == 1:
                     if self.verbose:
                         print("Player " + str(defender.get_id()) + " has lost the game and is now the DURAK!!")
-                    self.durak = defender
+                    return defender
 
             # Check if the defending player has won the game
             if defender.hand.is_empty():
@@ -269,7 +271,10 @@ class DurakModel(Model):
 
                 # Check if the game is over
                 if len(self.players) == 1:
-                    self.durak = attacker
+                    if attacker in self.winners:
+                        return defender.get_next_player()
+                    else:
+                        return attacker
 
         else:
             # Take cards if needed
@@ -296,7 +301,7 @@ class DurakModel(Model):
 
                     # Check if the game is over
                     if len(self.players) == 1:
-                        self.durak = attacker
+                        return attacker
 
             if num_cards_defender < self.num_starting_cards:
                 defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
@@ -342,6 +347,15 @@ class DurakModel(Model):
         # Clear the attack field
         field.clear()
 
+        # Return None if there is no Durak yet
+        return None
+
+    
+    def set_durak(self, durak):
+        '''
+        Sets the Durak.
+        '''
+        self.durak = durak
 
     def get_game_data(self):
         '''
