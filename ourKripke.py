@@ -5,9 +5,9 @@ import itertools
 
 # Generates all possible worlds in the game for the given players and cards.
 def gen_worlds(cards, players):
-    l = list(itertools.combinations_with_replacement(players, len(cards)))
+    locations = list(itertools.combinations_with_replacement(players, len(cards)))
     worlds = []
-    for i, state_set in enumerate(l):
+    for i, state_set in enumerate(locations):
         d = {place + cards[j]: True for j, place in enumerate(state_set)}
         w = World(str(i), d)
         # print(i, d)
@@ -30,40 +30,6 @@ def gen_kripke(worlds, players):
     ks = KripkeStructure(worlds, relations)
     # print(ks.relations)
     return ks, reachable
-
-
-# Quick demo of how the mlsolver library works, doubles as scratch code.
-def demo():
-    worlds = [
-        World('1', {'p': True, 'q': True}),
-        World('2', {'p': True, 'q': False}),
-        World('3', {'p': False, 'q': True})
-    ]
-    relations = {'A': {('1', '2'), ('2', '1'), ('1', '3'), ('3', '1'), ('1', '1'), ('2', '2'), ('3', '3')},
-                 'B': {('1', '3'), ('3', '1'), ('1', '1'), ('3', '3')}}
-    ks = KripkeStructure(worlds, relations)
-    print(ks)
-
-    ## In this model, all worlds with "neg p" are removed,
-    ## and so are all edges to and from those worlds.
-    # print("---------------Box--------------")
-    # print(ks.solve(Atom('p')))
-    # print(ks.solve(Box_a('A', Atom('p'))))
-    # print(ks.solve(Box_a('B', Atom('p'))))
-
-    ## Some more tests
-    # print("---------------Diamond--------------")
-    # print(ks.solve(Diamond_a('A', Atom('p'))))
-    # print(ks.solve(Diamond_a('B', Atom('p'))))
-
-    ## A cleaner but slower way of writing these
-    # formula = Diamond_a('2', Atom('p'))
-    # new_ks = ks.solve(formula)
-    # print(new_ks)
-
-    # This only shows the list of worlds in which the
-    # formula does not work, TODO might be useful.
-    print(ks.nodes_not_follow_formula(Atom('p')))
 
 
 # Remove all links for the given player to and/or from
@@ -95,6 +61,7 @@ def remove_links(ks, player, statement, reachable):
 
 # Add all links for the given player to and/or from
 # worlds in which the given statement is true.
+# TODO only add when not already in there
 def add_links(ks, player, statement, reachable):
     print("Adding links...")
 
@@ -126,34 +93,40 @@ def add_links(ks, player, statement, reachable):
     return ks, reachable
 
 
-full_cards = ['2S', '2C', '2H', '3S', '3C', '3H', '4S', '4C', '4H']
-full_players = ['B', 'M', 'L', 'Deck', 'Discard']
-hand_players = ['B', 'M', 'L']
-
-k_m, reachable_worlds = gen_kripke(gen_worlds(full_cards, full_players), hand_players)
-print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
-print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
-print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+def card_move(all_players, from_player, to_player, card, ks, reachable):
+    for p in all_players:
+        fuller_model, reachable = add_links(ks, p, Atom(to_player + card), reachable)
+        final_model, reachable = remove_links(fuller_model, p, Atom(from_player + card), reachable)
 
 
-# Development sets etc.
-full_numbers = ['2', '3', '4']
-full_suits = ['S', 'C', 'H']
-test_cards = ['2S', '2C']
-test_players = ['B', 'Deck']
-test_hand_players = ['B']
+def dev_test():
+    # Development sets
+    full_numbers = ['2', '3', '4']
+    full_suits = ['S', 'C', 'H']
+    test_cards = ['2S', '2C']
+    test_players = ['B', 'Deck']
+    test_hand_players = ['B']
 
-# k_m, reachable_worlds = gen_kripke(gen_worlds(test_cards, test_players), test_hand_players)
-# print("Reachable:", reachable_worlds)
-# print("Full model:", k_m)
-# test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
-# test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
+    k_m, reachable_worlds = gen_kripke(gen_worlds(test_cards, test_players), test_hand_players)
+    print("Reachable:", reachable_worlds)
+    print("Full model:", k_m)
+    test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+    test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
 
-# def card_move(all_players, from_player, to_player, card, ks, reachable):
-#     for p in all_players:
-#         fuller_model, reachable = add_links(ks, p, Atom(to_player + card), reachable)
-#         final_model, reachable = remove_links(fuller_model, p, Atom(from_player + card), reachable)
-#
-# card_move(test_hand_players, 'B', 'B', '2S', k_m, reachable_worlds)
+    card_move(test_hand_players, 'B', 'B', '2S', k_m, reachable_worlds)
+
+
+def demo_full():
+    full_cards = ['2S', '2C', '2H', '3S', '3C', '3H', '4S', '4C', '4H']
+    full_players = ['B', 'M', 'L', 'Deck', 'Discard']
+    hand_players = ['B', 'M', 'L']
+
+    k_m, reachable_worlds = gen_kripke(gen_worlds(full_cards, full_players), hand_players)
+    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
+    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+
+
+demo_full()
