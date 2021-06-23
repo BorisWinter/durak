@@ -1,5 +1,4 @@
 from mlsolver.kripke import World, KripkeStructure
-from mlsolver.model import add_symmetric_edges, add_reflexive_edges
 from mlsolver.formula import *
 import itertools
 
@@ -31,25 +30,6 @@ def gen_kripke(worlds, players):
     ks = KripkeStructure(worlds, relations)
     # print(ks.relations)
     return ks, reachable
-
-
-# Given all worlds, generates a Kripke model. # TODO used for development
-def gen_str_kripke(worlds, players):
-    name_count_worlds = len(worlds) - 1  # Naming starts at 0
-    full_edges = set((str(x), str(x + 1)) for x in range(0, name_count_worlds))  # one way
-    full_edges.update({('0', str(name_count_worlds)), (str(name_count_worlds), '0')})  # last and first
-
-    # Update with symmetric and reflexive edges. If needed, refer to
-    # mlsolver.model for functions that do this for entire set of relations.
-    full_edges.update(set((str(x), str(x - 1)) for x in range(1, name_count_worlds + 1)))  # symmetric
-    full_edges.update(set((str(x), str(x)) for x in range(0, name_count_worlds + 1)))  # reflexive
-
-    # full_edges = set(sorted(full_edges))
-    relations = {p: full_edges for p in players}
-
-    ks = KripkeStructure(worlds, relations)
-    # print(ks.relations)
-    return ks
 
 
 # Quick demo of how the mlsolver library works, doubles as scratch code.
