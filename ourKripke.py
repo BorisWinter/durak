@@ -6,6 +6,8 @@ from progress.bar import *
 
 # TODO can we think of any more restrictions?
 def illegal_world(state_set, players, start_cards_per_player):
+    if len(state_set) < 10:
+        return False
     if not state_set.count('Discard') % 2 == 0:
         return True
     if state_set.count('Deck') > (len(state_set) - len(players) - start_cards_per_player):
@@ -39,10 +41,21 @@ def gen_worlds(cards, players, hand_players):
     return worlds
 
 
+def gen_empty_kripke(worlds, players):
+    relations = {p: set() for p in players}
+    reachable = {p: [] for p in players}
+    # print(relations)
+
+    ks = KripkeStructure(worlds, relations)
+    print("Generated empty model.")
+    return ks, reachable
+
+
 # Given all worlds, generates a fully connected Kripke model.
 def gen_kripke(worlds, players):
     # print("Generating relations, itertools takes a while")  # TODO explore generating dynamically, i.e. from 0 up
     w = list(itertools.product(worlds, repeat=2))
+    # w = list(itertools.combinations_with_replacement(worlds, 2))
     print("Number of relations:", len(w))
     full_edges = set()
     bar = Bar('Adding relations', max=len(w), suffix='%(percent)d%%')
@@ -138,8 +151,8 @@ def dev_test():
     k_m, reachable_worlds = gen_kripke(gen_worlds(test_cards, test_players, test_hand_players), test_hand_players)
     print("Reachable:", reachable_worlds)
     print("Full model:", k_m)
-    test_removed, reachable_worlds = remove_links(k_m, 'B', And(Not(Atom('B2C')), Atom('B2S')), reachable_worlds)
-    test_added, reachable_worlds = add_links(test_removed, 'B', And(Not(Atom('B2C')), Atom('B2S')), reachable_worlds)
+    # test_removed, reachable_worlds = remove_links(k_m, 'B', And(Not(Atom('B2C')), Atom('B2S')), reachable_worlds)
+    test_added, reachable_worlds = add_links(k_m, 'B', Atom('B2S'), reachable_worlds)
 
     # card_move(test_hand_players, 'B', 'B', '2S', k_m, reachable_worlds)
 
@@ -150,11 +163,11 @@ def demo_full():
     hand_players = ['B', 'M', 'L']
 
     all_worlds = gen_worlds(full_cards, full_players, hand_players)
-    k_m, reachable_worlds = gen_kripke(all_worlds, hand_players)
+    k_m, reachable_worlds = gen_empty_kripke(all_worlds, hand_players)
     print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-    test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
-    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-    test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
+    # test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+    # print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    test_added, reachable_worlds = add_links(k_m, 'B', Atom('B2S'), reachable_worlds)
     print("Number of reachable worlds for B:", len(reachable_worlds['B']))
 
 
