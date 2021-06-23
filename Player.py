@@ -4,71 +4,33 @@ from Hand import Hand
 from KnowledgeFact import KnowledgeFact, KnowledgeDisjunct
 import Moves
 import random
+import strategies
 
 class Player(Agent):
     """
     Models a player in the game of Durak
     """
 
-    def __init__(self, unique_id, model, attack_fields, num_players):
+    def __init__(self, unique_id, model, attack_fields, num_players, strategy, knowledge_depth):
         super().__init__(unique_id, model)
         self.id = unique_id
         self.hand = Hand(self.id)
         self.attack_field = attack_fields[self.id]
         self.defence_field = attack_fields[(self.id - 1) % num_players]
-        self.private_knowledge = self.initial_knowledge()
-        self.private_disjunct_knowledge = []
-        self.common_knowledge = []
-
+        self.strategy = strategy
+        self.knowledge_depth = knowledge_depth
 
     def __repr__(self):
         '''
         Returns the representation of the player.
         '''
-        return "\n Player " + str(self.id) + "\n\t Hand : " + str(self.hand) + "\n\t Knowledge : " +\
-               str(self.private_knowledge) + "\n" + str(self.private_disjunct_knowledge)
-
-
-
-
-
-    def get_knowledge_about_other_player(self, other_player):
-        single_fact_list = []
-        disjunct_fact =  []
-        for fact in self.private_knowledge:
-            if fact.owner_card == other_player:
-                if type(fact.card) != int:
-                    single_fact_list.append(fact)
-        for fact in self.private_disjunct_knowledge:
-            if fact.owner_card == other_player:
-                disjunct_fact = fact
-
-        return single_fact_list, disjunct_fact
-
-    def get_private_single_knowledge_about_other_player(self, other_player):
-        single_fact_list = []
-        for fact in self.private_knowledge:
-            if fact.owner_card == other_player:
-                if type(fact.card) != int:
-                    single_fact_list.append(fact)
-
-
-        return single_fact_list
-
-    def initial_knowledge(self):
-        return []
-
-    def update_knowledge_own_hand(self):
-        # step 1: the agent KNOWS its own hand
-        self.private_knowledge = [] # knowledge about the current state of hand only
-        for card in self.hand.get_cards_in_hand():
-            knowledge = KnowledgeFact("K", self.id, card, self.id)
-            if knowledge not in self.private_knowledge:
-                self.private_knowledge.append(knowledge)
-
+        return "\n Player " + str(self.id) + "\n\t Hand : " + str(self.hand) + "\n"
 
 
     def get_number_of_cards_in_hand(self):
+        '''
+        Returns the number of cards in the player's hand
+        '''
         return len(self.hand.cards)
 
     def step(self):
@@ -159,7 +121,36 @@ class Player(Agent):
         '''
 
         # Choose a card to play
-        card = random.choice(self.hand.get_cards_in_hand())
+        if self.strategy == "random":
+            card = random.choice(self.hand.get_cards_in_hand())
+        elif self.strategy == "normal":
+            #--------- Depth 1 ----------#
+            if self.knowledge_depth == 1:
+                
+                this_player = str(self.get_id())
+                defending_player = str(self.get_next_player().get_id())
+                # defenders_cards = self.model.kripke_model.player_knows_cards_of_player(this_player, defending_player)
+                defenders_cards = []
+                # TODO: convert the string cards to actual cards
+                highest_defending_card = None
+                for c in defenders_cards:
+                    if c.get_rank() > highest_defending_card.get_rank():
+                        highest_defending_card = c
+
+                if highest_defending_card:
+                    winning_card = self.hand.get_lowest_card_that_wins_attack(highest_defending_card)
+                    if winning_card:
+                        card = winning_card
+                    else:
+                        card = self.hand.get_lowest_card() # NO = Play your lowest card
+
+                else:
+                    # You DONT know one or more cards of the defender
+                    if self.get_next_player().get_number_of_cards_in_hand() == 1: # NO = Does the defender only have one card?
+                        card = self.hand.get_highest_card() # YES = Play your highest card
+                    else:
+                        card = self.hand.get_lowest_card() # NO = Play your lowest card
+
 
         # Play the card(s)
         if card in self.hand.get_cards_in_hand():
@@ -179,8 +170,19 @@ class Player(Agent):
         # Choose a card to defend against
         attacking_card = random.choice(self.defence_field.get_attacking_cards())
 
-        # Pick a card from your hand to defend with
-        defending_card = random.choice(self.hand.get_cards_in_hand())
+        # Choose a card to defend with
+        if self.strategy == "random":
+            defending_card = random.choice(self.hand.get_cards_in_hand())
+        elif self.strategy == "normal":
+            #--------- Depth 1 ----------#
+            if self.knowledge_depth == 1:
+                # Can you beat the attacking card?
+                winning_card = self.hand.get_lowest_card_that_wins_defence(attacking_card) 
+                if winning_card:
+                    defending_card = winning_card # YES = Play lowest that beats that card
+                else:
+                    defending_card = self.hand.get_lowest_card() # NO = Play your lowest card
+
 
         # Play the card
         if defending_card in self.hand.get_cards_in_hand():
@@ -199,3 +201,10 @@ class Player(Agent):
         for i in range(num):
             if not model.deck.is_empty():
                 self.hand.add_card(model.deck.deal())
+
+    def get_cards_that_beat(self, card):
+        """
+        Returns a list with all cards in the player's hand that can beat the given card
+        """
+
+        

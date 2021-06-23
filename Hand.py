@@ -65,7 +65,7 @@ class Hand():
         return random.choice(self.get_cards_in_hand())
 
 
-    def get_lowest_card(self, deck):
+    def get_lowest_card(self):
         '''
         Return the lowest card in the hand
         '''
@@ -96,8 +96,13 @@ class Hand():
         return_card = None
         options = self.get_cards_in_hand()
         for card in options:
-            if card.get_ranking() < return_card.get_ranking() and card.get_ranking() >= attacking_card.get_ranking():
+            if return_card:
+                if card.get_ranking() > return_card.get_ranking() and card.get_ranking() >= attacking_card.get_ranking():
+                    return_card = card
+            elif card.get_ranking() >= attacking_card.get_ranking():
                 return_card = card
+
+        # If a winning card was found, return it
         if return_card:
             return return_card
         else:
@@ -111,8 +116,13 @@ class Hand():
         return_card = None
         options = self.get_cards_in_hand()
         for card in options:
-            if card.get_ranking() < return_card.get_ranking() and card.get_ranking() >= defending_card.get_ranking():
+            if return_card:
+                if card.get_ranking() > return_card.get_ranking() and card.get_ranking() > defending_card.get_ranking():
+                    return_card = card
+            elif card.get_ranking() > defending_card.get_ranking():
                 return_card = card
+
+        # If a winning card was found, return it
         if return_card:
             return return_card
         else:
