@@ -1,33 +1,61 @@
 from mlsolver.kripke import World, KripkeStructure
 from mlsolver.formula import *
 import itertools
+from progress.bar import *
+
+
+# TODO can we think of any more restrictions?
+def illegal_world(state_set, players, start_cards_per_player):
+    if not state_set.count('Discard') % 2 == 0:
+        return True
+    if state_set.count('Deck') > (len(state_set) - len(players) - start_cards_per_player):
+        # print(state_set.count('Deck'))
+        return True
+    for p in players:
+        # one player has all the cards (TODO only removes three states)
+        if state_set.count(p) == len(state_set):
+            # print("Look,", p, "has all the cards!")
+            return True
+    return False
 
 
 # Generates all possible worlds in the game for the given players and cards.
-def gen_worlds(cards, players):
-    locations = list(itertools.product(players, repeat=len(cards)))
+def gen_worlds(cards, players, hand_players):
+    # TODO the first is correct, but generates SO MANY WORLDS that everything crashes when trying to add full relations.
+    # locations = list(itertools.product(players, repeat=len(cards)))
+    locations = list(itertools.combinations_with_replacement(players, len(cards)))
     worlds = []
+    bar = Bar('Generating worlds', max=len(locations)/2, suffix='%(percent)d%%')
     for i, state_set in enumerate(locations):
-        d = {place + cards[j]: True for j, place in enumerate(state_set)}
-        w = World(str(i), d)
-        # print(i, d)
-        worlds.append(w)
+        if not illegal_world(state_set, hand_players, 2):
+            # print(i)
+            d = {place + cards[j]: True for j, place in enumerate(state_set)}
+            w = World(str(i), d)
+            # print(i, d)
+            worlds.append(w)
+            bar.next()
+    bar.finish()
     print("Generated", len(worlds), "worlds.")
     return worlds
 
 
 # Given all worlds, generates a fully connected Kripke model.
 def gen_kripke(worlds, players):
+    # print("Generating relations, itertools takes a while")  # TODO explore generating dynamically, i.e. from 0 up
     w = list(itertools.product(worlds, repeat=2))
+    print("Number of relations:", len(w))
     full_edges = set()
+    bar = Bar('Adding relations', max=len(w), suffix='%(percent)d%%')
     for (w1, w2) in w:
         full_edges.update({(w1.name, w2.name)})
-
+        bar.next()
+    bar.finish()
     relations = {p: full_edges for p in players}
     reachable = {p: [world.name for world in worlds] for p in players}
     # print(relations)
 
     ks = KripkeStructure(worlds, relations)
+    print("Generated model. ")
     # print(ks.relations)
     return ks, reachable
 
@@ -107,13 +135,13 @@ def dev_test():
     test_players = ['B', 'Deck']
     test_hand_players = ['B']
 
-    k_m, reachable_worlds = gen_kripke(gen_worlds(test_cards, test_players), test_hand_players)
+    k_m, reachable_worlds = gen_kripke(gen_worlds(test_cards, test_players, test_hand_players), test_hand_players)
     print("Reachable:", reachable_worlds)
     print("Full model:", k_m)
     test_removed, reachable_worlds = remove_links(k_m, 'B', And(Not(Atom('B2C')), Atom('B2S')), reachable_worlds)
-    test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
+    test_added, reachable_worlds = add_links(test_removed, 'B', And(Not(Atom('B2C')), Atom('B2S')), reachable_worlds)
 
-    card_move(test_hand_players, 'B', 'B', '2S', k_m, reachable_worlds)
+    # card_move(test_hand_players, 'B', 'B', '2S', k_m, reachable_worlds)
 
 
 def demo_full():
@@ -121,7 +149,8 @@ def demo_full():
     full_players = ['B', 'M', 'L', 'Deck', 'Discard']
     hand_players = ['B', 'M', 'L']
 
-    k_m, reachable_worlds = gen_kripke(gen_worlds(full_cards, full_players), hand_players)
+    all_worlds = gen_worlds(full_cards, full_players, hand_players)
+    k_m, reachable_worlds = gen_kripke(all_worlds, hand_players)
     print("Number of reachable worlds for B:", len(reachable_worlds['B']))
     test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
     print("Number of reachable worlds for B:", len(reachable_worlds['B']))
@@ -129,5 +158,7 @@ def demo_full():
     print("Number of reachable worlds for B:", len(reachable_worlds['B']))
 
 
-# demo_full()
-dev_test()
+demo_full()
+# dev_test()
+
+# print(list(itertools.product('ABCD', repeat=3)))
