@@ -6,19 +6,20 @@ from Deck import Deck
 from DiscardPile import DiscardPile
 from KnowledgeFact import KnowledgeFact
 from Inference import Inference
+from ourKripke import Kripke
 
 class DurakModel(Model):
     """A model for the game of Durak with some number of players."""
 
     def __init__(
         self, 
-        num_players = 3,
-        num_suits = 3,
-        num_cards_per_suit = 3,
+        num_players = 2,
+        num_suits = 2,
+        num_cards_per_suit = 2,
         num_starting_cards = 1,
         player_strategies = ["random", "random", "random"], 
         player_depths = [1,1,1],
-        verbose = False):
+        verbose = True):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -80,6 +81,8 @@ class DurakModel(Model):
 
         # one-off action: trump card is common knowledge
         self.add_common_knowledge(self.deck.get_trump_card(), "deck")
+        self.test()
+
 
 
 
@@ -345,12 +348,24 @@ class DurakModel(Model):
                     print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
         
         # Clear the attack field
+
+        self.test()
+
         field.clear()
 
         # Return None if there is no Durak yet
         return None
 
-    
+    def test(self):
+        print("GAME STATE")
+        print(self.players)
+
+        for player in self.players:
+            print(player.hand.get_cards_in_hand())
+
+
+        print("END GAME STATE")
+
     def set_durak(self, durak):
         '''
         Sets the Durak.
@@ -395,11 +410,11 @@ def play(m):
 
 
 
-# m = DurakModel()
-# print("Starting state...")
-# print(m)
-# print("Play! ")
-# play(m)
+m = DurakModel()
+print("Starting state...")
+print(m)
+print("Play! ")
+play(m)
 
 # print(m.return_winning_card(m.players[0].hand.get_cards_in_hand()[0], m.players[1].hand.get_cards_in_hand()[0]))
 

@@ -4,6 +4,12 @@ import itertools
 from progress.bar import *
 
 
+#class Kripke:
+
+#    def __init__(self):
+#        pass
+
+
 # TODO can we think of any more restrictions?
 def illegal_world(state_set, players, start_cards_per_player):
     if len(state_set) < 10:
@@ -19,6 +25,10 @@ def illegal_world(state_set, players, start_cards_per_player):
             # print("Look,", p, "has all the cards!")
             return True
     return False
+
+
+
+
 
 
 # Generates all possible worlds in the game for the given players and cards.
@@ -162,6 +172,10 @@ def demo_full():
     full_players = ['B', 'M', 'L', 'Deck', 'Discard']
     hand_players = ['B', 'M', 'L']
 
+    full_cards = ['2S', '2C', '2H']
+    full_players = ['B''Deck']
+    hand_players = ['B']
+
     all_worlds = gen_worlds(full_cards, full_players, hand_players)
     k_m, reachable_worlds = gen_empty_kripke(all_worlds, hand_players)
     print("Number of reachable worlds for B:", len(reachable_worlds['B']))
@@ -171,7 +185,8 @@ def demo_full():
     print("Number of reachable worlds for B:", len(reachable_worlds['B']))
 
 
+
 demo_full()
-# dev_test()
+#dev_test()
 
 # print(list(itertools.product('ABCD', repeat=3)))
