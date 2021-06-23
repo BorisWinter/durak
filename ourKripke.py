@@ -5,7 +5,7 @@ import itertools
 
 # Generates all possible worlds in the game for the given players and cards.
 def gen_worlds(cards, players):
-    locations = list(itertools.combinations_with_replacement(players, len(cards)))
+    locations = list(itertools.product(players, repeat=len(cards)))
     worlds = []
     for i, state_set in enumerate(locations):
         d = {place + cards[j]: True for j, place in enumerate(state_set)}
@@ -110,7 +110,7 @@ def dev_test():
     k_m, reachable_worlds = gen_kripke(gen_worlds(test_cards, test_players), test_hand_players)
     print("Reachable:", reachable_worlds)
     print("Full model:", k_m)
-    test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+    test_removed, reachable_worlds = remove_links(k_m, 'B', And(Not(Atom('B2C')), Atom('B2S')), reachable_worlds)
     test_added, reachable_worlds = add_links(test_removed, 'B', Atom('B2S'), reachable_worlds)
 
     card_move(test_hand_players, 'B', 'B', '2S', k_m, reachable_worlds)
@@ -129,4 +129,5 @@ def demo_full():
     print("Number of reachable worlds for B:", len(reachable_worlds['B']))
 
 
-demo_full()
+# demo_full()
+dev_test()
