@@ -6,7 +6,9 @@ from Deck import Deck
 from DiscardPile import DiscardPile
 from KnowledgeFact import KnowledgeFact
 from Inference import Inference
+
 from ourKripke import Kripke
+import random
 
 class DurakModel(Model):
     """A model for the game of Durak with some number of players."""
@@ -17,7 +19,7 @@ class DurakModel(Model):
         num_suits = 2,
         num_cards_per_suit = 2,
         num_starting_cards = 1,
-        player_strategies = ["random", "random", "random"], 
+        player_strategies = ["normal", "random", "random"], 
         player_depths = [1,1,1],
         verbose = True):
         '''
@@ -28,8 +30,8 @@ class DurakModel(Model):
         :param num_starting_cards: The number of cards that each player starts with
         '''
         self.players = []
-        self.player_strategies = []
-        self.player_depths = []
+        self.player_strategies = player_strategies
+        self.player_depths = player_depths
         self.winners = []
         self.durak = None
         self.attack_fields = []
@@ -47,7 +49,7 @@ class DurakModel(Model):
 
         for i in range(self.num_players):
             # Create the players
-            player = Player(i, self, self.attack_fields, self.num_players)
+            player = Player(i, self, self.attack_fields, self.num_players, self.player_strategies[i], self.player_depths[i])
             self.players.append(player)
             self.schedule.add(player)
 
@@ -65,6 +67,10 @@ class DurakModel(Model):
         # Create the deck and shuffle it
         self.deck = Deck(num_suits, num_cards_per_suit)
 
+        # Create the initial Kripke model with all players and all cards in the deck
+        self.kripke_worlds = gen_worlds([str(c) for c in self.deck.deck], [str(p.get_id()) for p in self.players])
+        # print("DECK ======= " + str(self.deck.deck))
+        # print("PLAYERS ======= " + str([p.get_id() for p in self.players]))
 
         # Deal
         for i in range(self.num_starting_cards):
@@ -72,17 +78,23 @@ class DurakModel(Model):
                 player.receive_card(self.deck.deal())
 
         # players know what card they have in their own hand
-        for player in self.players:
-            player.update_knowledge_own_hand()
+        # for player in self.players:
+        #     player.update_knowledge_own_hand()
 
-        # Select starting attacker TODO: Change to player with lowest suit
-        self.current_attacker = self.players[0]
-        self.current_defender = self.players[1]
+        # Select a random starting attacker and set the defender
+        self.current_attacker = random.choice(self.players)
+        self.current_defender = self.current_attacker.get_next_player()
 
         # one-off action: trump card is common knowledge
-        self.add_common_knowledge(self.deck.get_trump_card(), "deck")
-        self.test()
 
+        # self.add_common_knowledge(self.deck.get_trump_card(), "deck")
+
+        # Add the starting card knowledge to the Kripke model
+        # for p in self.players:
+        #     player_id = str(p.get_id())
+        #     for card in player.hand.get_cards_in_hand():
+        #         statement = Atom(str(player_id) + str(card))
+        #         add_links(self.kripke_model, player_id, statement, reachable)
 
 
 
@@ -93,7 +105,6 @@ class DurakModel(Model):
         return "---------STATE----------\n"\
             +"Deck: " + str(self.deck) \
                 + "\nTrump suit: " + self.deck.trump_suit \
-                    + "\n\nCommon Knowledge: " + str(self.common_knowledge) \
                         + "\n\nWinners: " + str(self.winners)\
                             + "\n\nPlayers: " + str(self.players)\
                                 + "\n\nAttack fields: " + str(self.attack_fields)\
@@ -197,7 +208,8 @@ class DurakModel(Model):
                     if fact.card == attack_card and fact.owner_card != defender.get_id():
                         to_remove.append(fact)
 
-                self.add_common_knowledge(attack_card, defender.id) # add common knowledge that cards go to loser
+                ### add common knowledge that cards go to loser
+
 
             for defend_card in defence_cards:
                 defender.receive_card(defend_card)
@@ -309,26 +321,20 @@ class DurakModel(Model):
             if num_cards_defender < self.num_starting_cards:
                 defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
 
-            ## every player knows how many cards every player/location has
-            # first remove all old common knowledge about hand limit
-
-            common_to_remove = self.remove_old_hand_num_knowledge(self.common_knowledge)
-            for item in common_to_remove:
-                self.common_knowledge.remove(item)
 
 
 
-            for player in self.players:
-                # remove knowledge about old hands from players
-                player_to_remove = self.remove_old_hand_num_knowledge(player.private_knowledge)
-                for item in player_to_remove:
-                    player.private_knowledge.remove(item)
+            # for player in self.players:
+            #     # remove knowledge about old hands from players
+            #     player_to_remove = self.remove_old_hand_num_knowledge(player.private_knowledge)
+            #     for item in player_to_remove:
+            #         player.private_knowledge.remove(item)
 
-                num = player.get_number_of_cards_in_hand()
-                player_id = player.id
-                self.add_common_knowledge_num(num, player_id)
+            #     num = player.get_number_of_cards_in_hand()
+            #     player_id = player.id
+            #     self.add_common_knowledge_num(num, player_id)
 
-            self.add_common_knowledge_num(len(self.deck.deck), "deck") # the players also know the number of cards in a deck
+            # self.add_common_knowledge_num(len(self.deck.deck), "deck") # the players also know the number of cards in a deck
 
 
         # Determine who's turn it is now
@@ -410,11 +416,12 @@ def play(m):
 
 
 
-m = DurakModel()
-print("Starting state...")
-print(m)
-print("Play! ")
-play(m)
+
+# m = DurakModel(verbose=True)
+# print("Starting state...")
+# print(m)
+# print("Play! ")
+# play(m)
 
 # print(m.return_winning_card(m.players[0].hand.get_cards_in_hand()[0], m.players[1].hand.get_cards_in_hand()[0]))
 

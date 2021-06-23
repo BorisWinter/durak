@@ -46,8 +46,8 @@ class CustomStagedActivation(BaseScheduler):
         self.time += self.stage_time
 
         # 2. Update the knowledge of the defending agent
-        getattr(defender, "update_knowledge_own_hand")()
-        self.time += self.stage_time
+        # getattr(defender, "update_knowledge_own_hand")()
+        # self.time += self.stage_time
 
         # 3. Defence stage
         getattr(defender, "defend")()
@@ -60,17 +60,11 @@ class CustomStagedActivation(BaseScheduler):
         self.time += self.stage_time
 
         # 5. Update the knowledge of all agents
-        for agent_key in agent_keys:
-            getattr(self._agents[agent_key], "update_knowledge_own_hand")()
-        self.time += self.stage_time
+        # for agent_key in agent_keys:
+        #     getattr(self._agents[agent_key], "update_knowledge_own_hand")()
+        # self.time += self.stage_time
 
-        # 6. We do inference in the inference engine
-        model.inference_engine.inference_for_players(model)
-        self.time += self.stage_time
-
-
-
-
+  
 
 
 
