@@ -199,21 +199,35 @@ class DurakModel(Model):
             for defend_card in defence_cards:
                 defender.receive_card(defend_card)
 
+            # Update the knowledge of all players
+            # --> REMOVE relations to all worlds where the defender does not have those cards
+            for player in self.players:
+                kripke_player = str(player.get_id())
+                kripke_defender = str(defender.get_id())
+                kripke_attack_card = str(attack_card)
+                kripke_defence_card = str(defend_card)
+                remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_attack_card), self.reachable_worlds)
+                remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_defence_card), self.reachable_worlds)
+
+
         else:
             if self.verbose:
                 print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
             # Discard pile gets the cards otherwise
             for attack_card in attack_cards:
                 self.discard_pile.add_card(attack_card)
-                for fact in self.common_knowledge:
-                    if fact.card == attack_card and fact.owner_card != "discard":
-                        to_remove.append(fact)
-
             for defend_card in defence_cards:
                 self.discard_pile.add_card(defend_card)
-                for fact in self.common_knowledge:
-                    if fact.card == defend_card and fact.owner_card != "discard":
-                        to_remove.append(fact)
+            
+            # Update the knowledge of all players
+            # --> REMOVE relations to all worlds where the discard pile does not have those cards
+            for player in self.players:
+                kripke_player = str(player.get_id())
+                kripke_discard_pile = "Discard"
+                kripke_attack_card = str(attack_card)
+                kripke_defence_card = str(defend_card)
+                remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_attack_card), self.reachable_worlds)
+                remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_defence_card), self.reachable_worlds)
 
 
         if self.deck.is_empty():

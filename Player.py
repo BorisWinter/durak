@@ -158,12 +158,13 @@ class Player(Agent):
             self.hand.remove_card(card)
 
         # Update the knowledge of the defender
-        # --> REMOVE all worlds where the attacker does not have that card
+        # --> REMOVE relations to all worlds where the attacker does not have that card
         kripke_attacker = str(self.get_id())
         kripke_defender = str(self.get_next_player().get_id())
         kripke_card = str(card)
         remove_links(self.model.kripke_model, kripke_defender, Atom(kripke_attacker + kripke_card), self.model.reachable_worlds)
 
+        # print("REACHABLE WORLDS ======= " + str(len(self.model.reachable_worlds["0"]) + len(self.model.reachable_worlds["1"]) + len(self.model.reachable_worlds["2"])))
 
         # Print an attack statement
         if self.model.verbose:
