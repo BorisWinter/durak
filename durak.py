@@ -19,7 +19,7 @@ class DurakModel(Model):
             num_suits=3,
             num_cards_per_suit=3,
             num_starting_cards=2,
-            player_strategies=["normal", "random", "random"],
+            player_strategies=["normal", "normal", "normal"],
             player_depths=[1, 1, 1],
             verbose=True):
         '''
@@ -90,7 +90,8 @@ class DurakModel(Model):
         for kripke_player in self.kripke_players:
             for card in player.hand.get_cards_in_hand():
                 statement = Atom(kripke_player + str(card))
-                add_links(self.kripke_model, kripke_player, statement, self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model,
+                                                                     kripke_player, statement, self.reachable_worlds)
 
     def __repr__(self):
         '''
@@ -203,8 +204,10 @@ class DurakModel(Model):
                 kripke_defender = str(defender.get_id())
                 kripke_attack_card = str(attack_card)
                 kripke_defence_card = str(defend_card)
-                add_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_attack_card), self.reachable_worlds)
-                add_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_defence_card), self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                                                    Atom(kripke_defender + kripke_attack_card), self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                                                    Atom(kripke_defender + kripke_defence_card), self.reachable_worlds)
 
             # --> REMOVE relations to all worlds where the defender does not have those cards
             for player in self.players:
@@ -212,10 +215,10 @@ class DurakModel(Model):
                 kripke_defender = str(defender.get_id())
                 kripke_attack_card = str(attack_card)
                 kripke_defence_card = str(defend_card)
-                remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_attack_card),
-                             self.reachable_worlds)
-                remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_defence_card),
-                             self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                                                    Atom(kripke_defender + kripke_attack_card), self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                                                    Atom(kripke_defender + kripke_defence_card), self.reachable_worlds)
 
         # Resolving of the attack if the defender wins
         else:
@@ -234,10 +237,10 @@ class DurakModel(Model):
                 kripke_discard_pile = "Discard"
                 kripke_attack_card = str(attack_card)
                 kripke_defence_card = str(defend_card)
-                remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_attack_card),
-                             self.reachable_worlds)
-                remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_defence_card),
-                             self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                                                Atom(kripke_discard_pile + kripke_attack_card), self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                                                Atom(kripke_discard_pile + kripke_defence_card), self.reachable_worlds)
 
         # If the deck is empty, no cards can be taken: check if there are winners
         if self.deck.is_empty():
@@ -380,8 +383,9 @@ def play(m):
     '''
 
     while not m.durak:
-        m.step()
         print(m)
+        m.step()
+    print(m)
 
     return m.get_game_data()
 

@@ -19,6 +19,7 @@ class Player(Agent):
         self.defence_field = attack_fields[(self.id - 1) % num_players]
         self.strategy = strategy
         self.knowledge_depth = knowledge_depth
+        # self.reachable_worlds = []
 
     def __repr__(self):
         '''
@@ -111,8 +112,9 @@ class Player(Agent):
                 this_player = str(self.get_id())
                 defender = self.get_next_player()
                 kripke_defender = str(defender.get_id())
-                # kripke_defenders_cards = self.model.kripke_model.player_knows_cards_of_player(this_player, defending_player)
-                kripke_defenders_cards = []
+                kripke_defenders_cards = player_knows_cards_of_player(this_player, self.model.reachable_worlds, kripke_defender)
+                print('OMG I JUST USED KNOWLEDGE')
+                # kripke_defenders_cards = []
                 defenders_cards = [c for c in defender.hand.cards if str(c) in kripke_defenders_cards]
                 highest_defending_card = None
 
