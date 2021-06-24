@@ -200,6 +200,16 @@ class DurakModel(Model):
                 defender.receive_card(defend_card)
 
             # Update the knowledge of all players
+            # --> ADD relations to all worlds where the defender does have those cards
+            # TODO: Limited by the current knowledge state
+            for player in self.players:
+                kripke_player = str(player.get_id())
+                kripke_defender = str(defender.get_id())
+                kripke_attack_card = str(attack_card)
+                kripke_defence_card = str(defend_card)
+                add_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_attack_card), self.reachable_worlds)
+                add_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_defence_card), self.reachable_worlds)
+
             # --> REMOVE relations to all worlds where the defender does not have those cards
             for player in self.players:
                 kripke_player = str(player.get_id())
