@@ -1,257 +1,514 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <!--
 	Editorial by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
 <html>
-	<head>
-		<title>The Game of дурак</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-	</head>
-	<body class="is-preload">
+  <head>
+    <title>The Game of дурак</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <link rel="stylesheet" href="assets/css/main.css" />
+  </head>
+  <body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+      <!-- Main -->
+      <div id="main">
+        <div class="inner">
+          <!-- Header -->
+          <header id="header">
+            <a href="index.html" class="logo"><strong> </strong></a>
+          </header>
 
-		<!-- Wrapper -->
-			<div id="wrapper">
+          <!-- Banner -->
+          <section id="banner">
+            <div class="content">
+              <header>
+                <h2>Higher Order Knowledge in the game of дурак (Durak)</h2>
+                <p>s2774291 / s3142558 / s3092836</p>
+              </header>
+              <p>
+                This project aims to analyze a simplified version of the Russian
+                card game дурак, using epistemic logic and Kripke models.
+              </p>
 
-				<!-- Main -->
-					<div id="main">
-						<div class="inner">
+              <ul class="actions">
+                <li>
+                  <a
+                    target="_blank"
+                    href="https://www.wikiwand.com/en/Durak"
+                    class="button big"
+                    >Wikipedia</a
+                  >
+                </li>
+                <li>
+                  <a
+                    target="_blank"
+                    href="https://github.com/BorisWinter/durak"
+                    class="button big"
+                    >Github</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <span class="image object">
+              <img src="images/durak_game.jpg" alt="" />
+            </span>
+          </section>
 
-							<!-- Header -->
-								<header id="header">
-									<a href="index.html" class="logo"><strong>Durak</strong></a>
-								</header>
+          <!-- Section -->
+          <section id="playing-durak">
+            <div class="features">
+              <header class="major">
+                <h2>Playing Durak</h2>
+              </header>
 
-							<!-- Banner -->
-								<section id="banner">
-									<div class="content">
-										<header>
-											<h1>The Use of Higher Order Knowledge in the game of дурак (Durak)</h1>
-											<p>A free and fully responsive site template</p>
-										</header>
-										<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam.</p>
+              <div class="content">
+                <header>
+                  <h3>Introduction to Durak's rules</h3>
+                </header>
+                <p>
+                  We play Durak in this simulation with very simplified rules.
+                  You can find a "playthrough" demonstration of the simple rules
+                  of the game below. We play with 3 suits, and cards are ranked
+                  according to number and trump suit. If Clubs is the trump
+                  suit, the ranking is as follows: C4 > C3 > C2 > S4 = H4 > S3 =
+                  H3 > S2 = H2.
+                </p>
+              </div>
 
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state1.jpg" alt=""
+                /></span>
+                <h3>Start of the Game</h3>
+                <p>
+                  All players have their cards dealt to them. In our basic game,
+                  the handlimit is two, meaning that every player has 2 cards.
+                  Players can only see their own cards. One of the cards in the
+                  deck is visible to the players (in this illustration, that's
+                  the 3 of Clubs), and its suit indicates the trump suit. The
+                  other cards in the deck are unknown to the players. The
+                  discard pile is empty.
+                </p>
+              </div>
 
-										<ul class="actions">
-											<li><a href="durakRules.html" class="button big">Learn Durak Rules</a></li>
-										</ul>
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state2.jpg" alt=""
+                /></span>
+                <h3>First attack</h3>
+                <p>
+                  The first player is selected randomly, in this case, it's
+                  North. This player does not have any information about the
+                  player they are attacking (South), so they follow the
+                  appropriate strategy.
+                </p>
+              </div>
 
-										<ul class="Theory">
-											<li><a href="theory.html" class="button big">Theory</a></li>
-										</ul>
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state3.jpg" alt=""
+                /></span>
+                <h3>Successful Defence</h3>
+                <p>
+                  Player South can successfully defend against the attack by
+                  North by playing a card with a higher value. A player has to
+                  defend if they can.
+                </p>
+              </div>
 
-										<ul class="Experiment Results">
-											<li><a href="durakRules.html" class="button big">Experiment Results</a></li>
-										</ul>
-									</div>
-									<span class="image object">
-										<img src="images/pic10.jpg" alt="" />
-									</span>
-								</section>
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state4.jpg" alt=""
+                /></span>
+                <h3>After a successful defence</h3>
+                <p>
+                  Both cards go to the discard pile and "disappear" from the
+                  game.
+                </p>
+              </div>
 
-							<!-- Section -->
-								<section>
-									<header class="major">
-										<h2>Erat lacinia</h2>
-									</header>
-									<div class="features">
-										<article>
-											<span class="icon fa-gem"></span>
-											<div class="content">
-												<h3>Portitor ullamcorper</h3>
-												<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											</div>
-										</article>
-										<article>
-											<span class="icon solid fa-paper-plane"></span>
-											<div class="content">
-												<h3>Sapien veroeros</h3>
-												<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											</div>
-										</article>
-										<article>
-											<span class="icon solid fa-rocket"></span>
-											<div class="content">
-												<h3>Quam lorem ipsum</h3>
-												<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											</div>
-										</article>
-										<article>
-											<span class="icon solid fa-signal"></span>
-											<div class="content">
-												<h3>Sed magna finibus</h3>
-												<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											</div>
-										</article>
-									</div>
-								</section>
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state5.jpg" alt=""
+                /></span>
+                <h3>Hand limit</h3>
+                <p>
+                  As both player's hand size is lower than the hand limit of 2,
+                  they both draw a new card from the deck.
+                </p>
+              </div>
 
-							<!-- Section -->
-								<section>
-									<header class="major">
-										<h2>Ipsum sed dolor</h2>
-									</header>
-									<div class="posts">
-										<article>
-											<a href="#" class="image"><img src="images/pic01.jpg" alt="" /></a>
-											<h3>Interdum aenean</h3>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											<ul class="actions">
-												<li><a href="#" class="button">More</a></li>
-											</ul>
-										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic02.jpg" alt="" /></a>
-											<h3>Nulla amet dolore</h3>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											<ul class="actions">
-												<li><a href="#" class="button">More</a></li>
-											</ul>
-										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic03.jpg" alt="" /></a>
-											<h3>Tempus ullamcorper</h3>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											<ul class="actions">
-												<li><a href="#" class="button">More</a></li>
-											</ul>
-										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic04.jpg" alt="" /></a>
-											<h3>Sed etiam facilis</h3>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											<ul class="actions">
-												<li><a href="#" class="button">More</a></li>
-											</ul>
-										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic05.jpg" alt="" /></a>
-											<h3>Feugiat lorem aenean</h3>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											<ul class="actions">
-												<li><a href="#" class="button">More</a></li>
-											</ul>
-										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic06.jpg" alt="" /></a>
-											<h3>Amet varius aliquam</h3>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-											<ul class="actions">
-												<li><a href="#" class="button">More</a></li>
-											</ul>
-										</article>
-									</div>
-								</section>
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state6.jpg" alt=""
+                /></span>
+                <h3>Next attack</h3>
+                <p>
+                  Player South now attacks player West (not according to the
+                  strategy, as West plays the highest value in the game. This
+                  behaviour would not happen in our simulated games, but would
+                  happen in real-life games. In this case this was done to
+                  illustrate an unsuccessful defence in the next step.).
+                </p>
+              </div>
 
-						</div>
-					</div>
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state7.jpg" alt=""
+                /></span>
+                <h3>Player West tries to defend</h3>
+                <p>
+                  Player West sees that they cannot win against Player South's
+                  card.
+                </p>
+              </div>
 
-				<!-- Sidebar -->
-					<div id="sidebar">
-						<div class="inner">
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state8.jpg" alt=""
+                /></span>
+                <h3>Unsuccessful defence</h3>
+                <p>
+                  Player West is unsuccessful and takes both cards in the attack
+                  field in their hand, as they could not defend.
+                </p>
+              </div>
 
-							<!-- Search -->
-								<section id="search" class="alt">
-									<form method="post" action="#">
-										<input type="text" name="query" id="query" placeholder="Search" />
-									</form>
-								</section>
+              <div class="content">
+                <span class="image right"
+                  ><img src="images/game-states/state9.jpg" alt=""
+                /></span>
+                <h3>Player South Hand Limit</h3>
+                <p>
+                  Player South has too few cards in hand now, and draws the
+                  final card from the deck. After this, players cannot draw any
+                  card from the deck anymore, and cards can only be removed to
+                  the discard pile. The player that reaches zero cards in hand
+                  first, wins!
+                </p>
+              </div>
+            </div>
+          </section>
 
-							<!-- Menu -->
-								<nav id="menu">
-									<header class="major">
-										<h2>Menu</h2>
-									</header>
-									<ul>
-										<li><a href="index.html">Homepage</a></li>
-										<li><a href="generic.html">Generic</a></li>
-										<li><a href="elements.html">Elements</a></li>
-										<li><a href="durakRules.html">Rules</a></li>
-										<li><a href="theory.html">Theory</a></li>
+          <!-- Content -->
+          <section id="theory">
+            <div class="features">
+              <header class="major">
+                <h2>Theory</h2>
+              </header>
+              <p>
+                Card games use many types of epistemic knowledge. You have the
+                private and direct knowledge, about your own hand, inferred
+                knowledge about the hands of the other players and the deck, and
+                knowledge about the cards that have been discarded. In this
+                page, we'll discuss the specific types of knowledge you can find
+                in our game of Durak, our updating Kripke model, as well as
+                possible extensions.
+              </p>
 
-										<li>
-											<span class="opener">Submenu</span>
-											<ul>
-												<li><a href="#">Lorem Dolor</a></li>
-												<li><a href="#">Ipsum Adipiscing</a></li>
-												<li><a href="#">Tempus Magna</a></li>
-												<li><a href="#">Feugiat Veroeros</a></li>
-											</ul>
-										</li>
-										<li><a href="#">Etiam Dolore</a></li>
-										<li><a href="#">Adipiscing</a></li>
-										<li>
-											<span class="opener">Another Submenu</span>
-											<ul>
-												<li><a href="#">Lorem Dolor</a></li>
-												<li><a href="#">Ipsum Adipiscing</a></li>
-												<li><a href="#">Tempus Magna</a></li>
-												<li><a href="#">Feugiat Veroeros</a></li>
-											</ul>
-										</li>
-										<li><a href="#">Maximus Erat</a></li>
-										<li><a href="#">Sapien Mauris</a></li>
-										<li><a href="#">Amet Lacinia</a></li>
-									</ul>
-								</nav>
+              <hr class="major" />
 
-							<!-- Section -->
-								<section>
-									<header class="major">
-										<h2>Ante interdum</h2>
-									</header>
-									<div class="mini-posts">
-										<article>
-											<a href="#" class="image"><img src="images/pic07.jpg" alt="" /></a>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore aliquam.</p>
-										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic08.jpg" alt="" /></a>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore aliquam.</p>
-										</article>
-										<article>
-											<a href="#" class="image"><img src="images/pic09.jpg" alt="" /></a>
-											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore aliquam.</p>
-										</article>
-									</div>
-									<ul class="actions">
-										<li><a href="#" class="button">More</a></li>
-									</ul>
-								</section>
+              <h2>The Kripke Model</h2>
+              <p>
+                We model the game as a Kripke model, where every world in the
+                model consists of the hands of each player + deck. So we have
+                propositional atoms that consist of SUIT_NUMBER_PLAYER,
+                representing that a certain card is in the hand of a player -
+                and no card can be in the hand of more than one player.
+              </p>
 
-							<!-- Section -->
-								<section>
-									<header class="major">
-										<h2>Get in touch</h2>
-									</header>
-									<p>Sed varius enim lorem ullamcorper dolore aliquam aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin sed aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
-									<ul class="contact">
-										<li class="icon solid fa-envelope"><a href="#">information@untitled.tld</a></li>
-										<li class="icon solid fa-phone">(000) 000-0000</li>
-										<li class="icon solid fa-home">1234 Somewhere Road #8254<br />
-										Nashville, TN 00000-0000</li>
-									</ul>
-								</section>
+              <div class="content">
+                <h3>Model properties</h3>
+                <p>
+                  Relations between our worlds are indistinguishability
+                  relations. Given the features of Durak, our model must have
+                  the following properties, as illustrated by the simplest
+                  Kripke Model (right).
+                </p>
+                <span class="image right"
+                  ><img src="images/simplestModel.jpeg" alt=""
+                /></span>
+                <dl>
+                  <dt>Reflexive</dt>
+                  <dd>
+                    <p>No player candistinguish a world from itself.</p>
+                  </dd>
+                  <dt>Symmetric</dt>
+                  <dd>
+                    <p>
+                      Player A can't distinguish world 1 from world 2, as A only
+                      has access to its own hand. In world 2, A should still
+                      consider world 1 possible. Hence, symmetric relations
+                      between worlds.
+                    </p>
+                  </dd>
+                  <dt>Transitive</dt>
+                  <dd>
+                    <p>
+                      If player A cannot distinguish world 1 from world 2, and
+                      not world 2 from world 3, then they can't distinguish 1
+                      from 3 either.
+                    </p>
+                  </dd>
+                </dl>
+              </div>
 
-							<!-- Footer -->
-								<footer id="footer">
-									<p class="copyright">&copy; Untitled. All rights reserved. Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-								</footer>
+              <p>
+                These properties imply that our model is an S5 model. Hence, we
+                can use S5 inference rules in our model.
+              </p>
 
-						</div>
-					</div>
+              <div class="content">
+                <h2>First Order Knowledge</h2>
+                <p>
+                  First Order Knowledge is the first level of knowledge that we
+                  can find in our Durak game. Every player knows the content of
+                  their own hand. Additionally, players can have first order
+                  knowledge about specific cards in the hands of other players.
+                  For example, if there are two players left in the game, each
+                  player can use the knowledge about their hand, and the cards
+                  in the discard pile, to deduce the cards in the hand of the
+                  other player.
+                </p>
 
-			</div>
+                <p>To add, how we derive knowledge from our Kripke model.</p>
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
+                <p>insert latex illustration here, to build.</p>
+              </div>
 
-	</body>
+              <div class="content">
+                <h2>Common Knowledge</h2>
+                <p>
+                  In Durak, there is a lot of common knowledge. When players
+                  attack, the attacking card becomes common knowledge, and the
+                  result of the attack (card to discard pile, or card to
+                  defending player) also becomes common knowledge. Hence, once a
+                  card has been played on the table once, every player always
+                  knows its location from that moment on.
+                </p>
+
+                <p>
+                  To add, how we derive common knowledge from our Kripke model.
+                </p>
+              </div>
+
+              <div class="content">
+                <h2>Second Order Knowledge</h2>
+                <p>
+                  There is a bit of second order knowledge in our game, but
+                  since the hands of the players are so small, there is not much
+                  use from it. In second order knowledge, a player knows that
+                  another player knows that the first player has some specific
+                  card. EXTEND
+                </p>
+
+                <p>insert illustration here, to build.</p>
+              </div>
+
+              <div class="content">
+                <h2>Updating the Kripke Model</h2>
+                <p>
+                  Not sure if this is public announcement or something
+                  different. Maybe it's just a run. In any case, the state of
+                  the game changes every turn, as cards switch hands.
+                </p>
+
+                <hr class="major" />
+
+                <h2>Limitations</h2>
+                <p>
+                  Playing with a greater hand limit, more use for higher-order
+                  knowledge in the strategies
+                </p>
+
+                <p>
+                  Probabilistic inference on possible cards. The player now does
+                  not consider possible cards, only the cards that it knows for
+                  sure. Extending this with either heuristic or formal
+                  probabilistic epistemic method and taking these into accounts
+                  in strategies might improve the win-chances of an agent.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Implementation -->
+          <section id="implementation">
+            <div class="features">
+              <header class="major">
+                <h2>Implementation</h2>
+              </header>
+              <div class="row">
+                <div class="col-6 col-12-small">
+                  <h3>Mesa</h3>
+                  <p>
+                    Nunc lacinia ante nunc ac lobortis. Interdum adipiscing
+                    gravida odio porttitor sem non mi integer non faucibus
+                    ornare mi ut ante amet placerat aliquet. Volutpat commodo eu
+                    sed ante lacinia. Sapien a lorem in integer ornare praesent
+                    commodo adipiscing arcu in massa commodo lorem accumsan at
+                    odio massa ac ac. Semper adipiscing varius montes viverra
+                    nibh in adipiscing blandit tempus accumsan.
+                  </p>
+                </div>
+                <div class="col-6 col-12-small">
+                  <h3>MLSolver</h3>
+                  <p>
+                    In arcu accumsan arcu adipiscing accumsan orci ac. Felis id
+                    enim aliquet. Accumsan ac integer lobortis commodo ornare
+                    aliquet accumsan erat tempus amet porttitor. Ante commodo
+                    blandit adipiscing integer semper orci eget. Faucibus
+                    commodo adipiscing mi eu nullam accumsan morbi arcu ornare
+                    odio mi adipiscing nascetur lacus ac interdum morbi accumsan
+                    vis mi accumsan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Experiments -->
+          <section id="experiments">
+            <div class="features">
+              <header class="major">
+                <h2>Experiments</h2>
+              </header>
+              <div class="row">
+                <div class="col-6 col-12-small">
+                  <h3>Influence of knowledge</h3>
+                  <p>
+                    Nunc lacinia ante nunc ac lobortis. Interdum adipiscing
+                    gravida odio porttitor sem non mi integer non faucibus
+                    ornare mi ut ante amet placerat aliquet. Volutpat commodo eu
+                    sed ante lacinia. Sapien a lorem in integer ornare praesent
+                    commodo adipiscing arcu in massa commodo lorem accumsan at
+                    odio massa ac ac. Semper adipiscing varius montes viverra
+                    nibh in adipiscing blandit tempus accumsan.
+                  </p>
+                </div>
+                <div class="col-6 col-12-small">
+                  <h3>test odio tempus commodo</h3>
+                  <p>
+                    In arcu accumsan arcu adipiscing accumsan orci ac. Felis id
+                    enim aliquet. Accumsan ac integer lobortis commodo ornare
+                    aliquet accumsan erat tempus amet porttitor. Ante commodo
+                    blandit adipiscing integer semper orci eget. Faucibus
+                    commodo adipiscing mi eu nullam accumsan morbi arcu ornare
+                    odio mi adipiscing nascetur lacus ac interdum morbi accumsan
+                    vis mi accumsan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Results -->
+          <section id="results">
+            <div class="features">
+              <header class="major">
+                <h2>Results</h2>
+              </header>
+              <div class="row">
+                <div class="col-6 col-12-small">
+                  <h3>Result</h3>
+                  <p>
+                    Nunc lacinia ante nunc ac lobortis. Interdum adipiscing
+                    gravida odio porttitor sem non mi integer non faucibus
+                    ornare mi ut ante amet placerat aliquet. Volutpat commodo eu
+                    sed ante lacinia. Sapien a lorem in integer ornare praesent
+                    commodo adipiscing arcu in massa commodo lorem accumsan at
+                    odio massa ac ac. Semper adipiscing varius montes viverra
+                    nibh in adipiscing blandit tempus accumsan.
+                  </p>
+                </div>
+                <div class="col-6 col-12-small">
+                  <h3>Result</h3>
+                  <p>
+                    In arcu accumsan arcu adipiscing accumsan orci ac. Felis id
+                    enim aliquet. Accumsan ac integer lobortis commodo ornare
+                    aliquet accumsan erat tempus amet porttitor. Ante commodo
+                    blandit adipiscing integer semper orci eget. Faucibus
+                    commodo adipiscing mi eu nullam accumsan morbi arcu ornare
+                    odio mi adipiscing nascetur lacus ac interdum morbi accumsan
+                    vis mi accumsan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Conclusion -->
+          <section id="conclusion">
+            <div class="features">
+              <header class="major">
+                <h2>Conclusion</h2>
+              </header>
+              <div class="row">
+                <div class="col-6 col-12-small">
+                  <h3>Conclusion1</h3>
+                  <p>
+                    Nunc lacinia ante nunc ac lobortis. Interdum adipiscing
+                    gravida odio porttitor sem non mi integer non faucibus
+                    ornare mi ut ante amet placerat aliquet. Volutpat commodo eu
+                    sed ante lacinia. Sapien a lorem in integer ornare praesent
+                    commodo adipiscing arcu in massa commodo lorem accumsan at
+                    odio massa ac ac. Semper adipiscing varius montes viverra
+                    nibh in adipiscing blandit tempus accumsan.
+                  </p>
+                </div>
+                <div class="col-6 col-12-small">
+                  <h3>Conclusion2</h3>
+                  <p>
+                    In arcu accumsan arcu adipiscing accumsan orci ac. Felis id
+                    enim aliquet. Accumsan ac integer lobortis commodo ornare
+                    aliquet accumsan erat tempus amet porttitor. Ante commodo
+                    blandit adipiscing integer semper orci eget. Faucibus
+                    commodo adipiscing mi eu nullam accumsan morbi arcu ornare
+                    odio mi adipiscing nascetur lacus ac interdum morbi accumsan
+                    vis mi accumsan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <div class="inner">
+          <!-- Menu -->
+          <nav id="menu">
+            <header class="major">
+              <h2>Menu</h2>
+            </header>
+            <ul>
+              <li><a href="#banner">Introduction</a></li>
+              <li><a href="#playing-durak">Playing дурак</a></li>
+              <!-- <li><a href="elements.html">Simplifications</a></li> -->
+              <li><a href="#theory">Theory</a></li>
+              <li><a href="#implementation">Implementation</a></li>
+              <li><a href="#experiments">Experiments</a></li>
+              <li><a href="#results">Results</a></li>
+              <li><a href="#conclusion">Conclusion</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
 </html>
