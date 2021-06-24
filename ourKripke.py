@@ -186,7 +186,7 @@ def demo_full():
 
 
 
-demo_full()
+# demo_full()
 #dev_test()
 
 # print(list(itertools.product('ABCD', repeat=3)))

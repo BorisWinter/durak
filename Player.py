@@ -4,7 +4,7 @@ from Hand import Hand
 from KnowledgeFact import KnowledgeFact, KnowledgeDisjunct
 import Moves
 import random
-import strategies
+from ourKripke import *
 
 class Player(Agent):
     """
@@ -156,6 +156,14 @@ class Player(Agent):
         if card in self.hand.get_cards_in_hand():
             self.attack_field.add_attack_card(card)
             self.hand.remove_card(card)
+
+        # Update the knowledge of the defender
+        # --> REMOVE all worlds where the attacker does not have that card
+        kripke_attacker = str(self.get_id())
+        kripke_defender = str(self.get_next_player().get_id())
+        kripke_card = str(card)
+        remove_links(self.model.kripke_model, kripke_defender, Atom(kripke_attacker + kripke_card), self.model.reachable_worlds)
+
 
         # Print an attack statement
         if self.model.verbose:

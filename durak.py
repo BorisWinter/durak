@@ -6,19 +6,18 @@ from Deck import Deck
 from DiscardPile import DiscardPile
 from KnowledgeFact import KnowledgeFact
 from Inference import Inference
-
-from ourKripke import Kripke
 import random
+from ourKripke import *
 
 class DurakModel(Model):
     """A model for the game of Durak with some number of players."""
 
     def __init__(
         self, 
-        num_players = 2,
-        num_suits = 2,
-        num_cards_per_suit = 2,
-        num_starting_cards = 1,
+        num_players = 3,
+        num_suits = 3,
+        num_cards_per_suit = 3,
+        num_starting_cards = 2,
         player_strategies = ["normal", "random", "random"], 
         player_depths = [1,1,1],
         verbose = True):
@@ -68,34 +67,28 @@ class DurakModel(Model):
         self.deck = Deck(num_suits, num_cards_per_suit)
 
         # Create the initial Kripke model with all players and all cards in the deck
-        self.kripke_worlds = gen_worlds([str(c) for c in self.deck.deck], [str(p.get_id()) for p in self.players])
-        # print("DECK ======= " + str(self.deck.deck))
-        # print("PLAYERS ======= " + str([p.get_id() for p in self.players]))
+        self.kripke_deck = [str(c) for c in self.deck.deck]
+        self.kripke_discard_pile = [str(c) for c in self.discard_pile.cards]
+        self.kripke_players = [str(p.get_id()) for p in self.players]
+        self.kripke_card_locations = ["Deck", "Discard"]
+        self.kripke_card_locations.extend(self.kripke_players)
+        self.kripke_worlds = gen_worlds(self.kripke_deck, self.kripke_card_locations, self.kripke_players)
+        self.kripke_model, self.reachable_worlds = gen_empty_kripke(self.kripke_worlds, self.kripke_players)
 
         # Deal
         for i in range(self.num_starting_cards):
             for player in self.players:
                 player.receive_card(self.deck.deal())
 
-        # players know what card they have in their own hand
-        # for player in self.players:
-        #     player.update_knowledge_own_hand()
-
         # Select a random starting attacker and set the defender
         self.current_attacker = random.choice(self.players)
         self.current_defender = self.current_attacker.get_next_player()
 
-        # one-off action: trump card is common knowledge
-
-        # self.add_common_knowledge(self.deck.get_trump_card(), "deck")
-
         # Add the starting card knowledge to the Kripke model
-        # for p in self.players:
-        #     player_id = str(p.get_id())
-        #     for card in player.hand.get_cards_in_hand():
-        #         statement = Atom(str(player_id) + str(card))
-        #         add_links(self.kripke_model, player_id, statement, reachable)
-
+        for kripke_player in self.kripke_players:
+            for card in player.hand.get_cards_in_hand():
+                statement = Atom(kripke_player + str(card))
+                add_links(self.kripke_model, kripke_player, statement, self.reachable_worlds)
 
 
     def __repr__(self):
@@ -203,49 +196,25 @@ class DurakModel(Model):
             # Defender gets the cards if attacker wins
             for attack_card in attack_cards:
                 defender.receive_card(attack_card)
-
-                for fact in self.common_knowledge:
-                    if fact.card == attack_card and fact.owner_card != defender.get_id():
-                        to_remove.append(fact)
-
-                ### add common knowledge that cards go to loser
-
-
             for defend_card in defence_cards:
                 defender.receive_card(defend_card)
-
-                for fact in self.common_knowledge:
-                    if fact.card == defend_card and fact.owner_card != defender.get_id():
-                        to_remove.append(fact)
-
-                self.add_common_knowledge(defend_card, defender.id)
 
         else:
             if self.verbose:
                 print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
             # Discard pile gets the cards otherwise
-
             for attack_card in attack_cards:
                 self.discard_pile.add_card(attack_card)
-
                 for fact in self.common_knowledge:
                     if fact.card == attack_card and fact.owner_card != "discard":
                         to_remove.append(fact)
 
-                self.add_common_knowledge(attack_card, "discard")
-
             for defend_card in defence_cards:
                 self.discard_pile.add_card(defend_card)
-
                 for fact in self.common_knowledge:
                     if fact.card == defend_card and fact.owner_card != "discard":
                         to_remove.append(fact)
 
-                self.add_common_knowledge(defend_card, "discard")   # maybe put this in a function
-
-
-            for fact in to_remove:
-                self.common_knowledge.remove(fact)
 
         if self.deck.is_empty():
             # Check if the attacking player has won the game
@@ -289,6 +258,8 @@ class DurakModel(Model):
                     if attacker in self.winners:
                         return defender.get_next_player()
                     else:
+                        if self.verbose:
+                            print("Player " + str(defender.get_id()) + " has lost the game and is now the DURAK!!")
                         return attacker
 
         else:
@@ -321,22 +292,6 @@ class DurakModel(Model):
             if num_cards_defender < self.num_starting_cards:
                 defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
 
-
-
-
-            # for player in self.players:
-            #     # remove knowledge about old hands from players
-            #     player_to_remove = self.remove_old_hand_num_knowledge(player.private_knowledge)
-            #     for item in player_to_remove:
-            #         player.private_knowledge.remove(item)
-
-            #     num = player.get_number_of_cards_in_hand()
-            #     player_id = player.id
-            #     self.add_common_knowledge_num(num, player_id)
-
-            # self.add_common_knowledge_num(len(self.deck.deck), "deck") # the players also know the number of cards in a deck
-
-
         # Determine who's turn it is now
         if attacker_wins:
             self.current_attacker = defender.get_next_player()
@@ -354,9 +309,7 @@ class DurakModel(Model):
                     print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
         
         # Clear the attack field
-
-        self.test()
-
+        # self.test()
         field.clear()
 
         # Return None if there is no Durak yet
@@ -407,7 +360,7 @@ def play(m):
 
     while not m.durak:
         m.step()   
-        # print(m)
+        print(m)
     
     return m.get_game_data()
 
@@ -417,11 +370,11 @@ def play(m):
 
 
 
-# m = DurakModel(verbose=True)
+m = DurakModel(verbose=True)
 # print("Starting state...")
 # print(m)
 # print("Play! ")
-# play(m)
+play(m)
 
 # print(m.return_winning_card(m.players[0].hand.get_cards_in_hand()[0], m.players[1].hand.get_cards_in_hand()[0]))
 
