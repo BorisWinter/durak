@@ -185,6 +185,7 @@ class DurakModel(Model):
                 if self.return_winning_card(attack_card, defence_cards[i]) == attack_card:
                     attacker_wins = True
 
+        # Resolving of the attack if the attacker wins
         if attacker_wins:
             if self.verbose:
                 print("Player " + str(attacker.get_id()) + " won! The cards go to player " + str(defender.get_id()))
@@ -216,7 +217,7 @@ class DurakModel(Model):
                 remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_defence_card),
                              self.reachable_worlds)
 
-
+        # Resolving of the attack if the defender wins
         else:
             if self.verbose:
                 print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
@@ -238,6 +239,7 @@ class DurakModel(Model):
                 remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_defence_card),
                              self.reachable_worlds)
 
+        # If the deck is empty, no cards can be taken: check if there are winners
         if self.deck.is_empty():
             # Check if the attacking player has won the game
             if attacker.hand.is_empty():
@@ -284,6 +286,7 @@ class DurakModel(Model):
                             print("Player " + str(defender.get_id()) + " has lost the game and is now the DURAK!!")
                         return attacker
 
+        # The deck is not empty
         else:
             # Take cards if needed
             num_cards_attacker = len(attacker.hand.get_cards_in_hand())
@@ -331,7 +334,6 @@ class DurakModel(Model):
                     print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
 
         # Clear the attack field
-        # self.test()
         field.clear()
 
         # Return None if there is no Durak yet
@@ -383,13 +385,9 @@ def play(m):
 
     return m.get_game_data()
 
-    # Currently stops with an error b/c winning conditions still need to be implemented
-
 
 m = DurakModel(verbose=True)
 # print("Starting state...")
 # print(m)
 # print("Play! ")
 play(m)
-
-# print(m.return_winning_card(m.players[0].hand.get_cards_in_hand()[0], m.players[1].hand.get_cards_in_hand()[0]))

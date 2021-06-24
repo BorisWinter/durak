@@ -21,7 +21,6 @@ class DiscardPile():
         '''
         return self.cards
 
-
     def add_card(self, card):
         '''
         Adds a card to the discard pile

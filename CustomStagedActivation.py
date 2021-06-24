@@ -39,38 +39,20 @@ class CustomStagedActivation(BaseScheduler):
         Executes all the stages for all agents. 
         """
         agent_keys = list(self._agents.keys())
-        # attacker = self._agents[current_attacker_key]
 
         # 1. Attack stage
         getattr(attacker, "attack")()
         self.time += self.stage_time
 
-        # 2. Update the knowledge of the defending agent
-        # getattr(defender, "update_knowledge_own_hand")()
-        # self.time += self.stage_time
-
-        # 3. Defence stage
+        # 2. Defence stage
         getattr(defender, "defend")()
         self.time += self.stage_time
 
-        # 4. Resolve attack stage
+        # 3. Resolve attack stage
         durak = model.resolve_attack(attacker, defender)
         if durak:
             self.model.set_durak(durak)
         self.time += self.stage_time
 
-        # 5. Update the knowledge of all agents
-        # for agent_key in agent_keys:
-        #     getattr(self._agents[agent_key], "update_knowledge_own_hand")()
-        # self.time += self.stage_time
-
-  
-
-
-
-
-
-
-        
-
+        # Update the step count
         self.steps += 1

@@ -41,22 +41,11 @@ class Deck():
                 else:
                     card.set_ranking(num_cards_per_suit + self.values.index((card.get_value())))
 
+        # Make a copy of the initial deck
         self.initial_deck = self.deck.copy()
-
-        # First add all non-trump cards to the ranking, then all trump cards
-        # for i in range(num_cards_per_suit):
-        #     rank = [card for card in self.deck if card.get_suit() != self.trump_suit and card.get_value() == Deck.AVAILABLE_VALUES[i]]
-        #     self.ranking_order.append(rank)
-        # for i in range(num_cards_per_suit):
-        #     rank = [card for card in self.deck if card.get_suit() == self.trump_suit and card.get_value() == Deck.AVAILABLE_VALUES[i]]
-        #     self.ranking_order.append(rank)
 
         # Shuffle the deck
         self.shuffle() ###-> turned off for debugging
-
-
-        
-
 
 
     def __repr__(self):

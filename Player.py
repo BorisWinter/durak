@@ -2,7 +2,6 @@ from AttackField import AttackField
 from mesa import Agent
 from Hand import Hand
 from KnowledgeFact import KnowledgeFact, KnowledgeDisjunct
-import Moves
 import random
 from ourKripke import *
 
@@ -35,14 +34,8 @@ class Player(Agent):
 
     def step(self):
         '''
+        The agent's step function. Not used because not all steps are the same.
         '''
-        # The agent's step will go here.
-        # For demonstration purposes we will print the agent's unique_id
-        # print ("Hi, I am player " + str(self.unique_id) +".")
-
-        self.update_knowledge_own_hand()
-
-        self.attack()
 
     def get_id(self):
         '''
@@ -115,13 +108,15 @@ class Player(Agent):
         elif self.strategy == "normal":
             # --------- Depth 1 ----------#
             if self.knowledge_depth == 1:
-
                 this_player = str(self.get_id())
-                defending_player = str(self.get_next_player().get_id())
-                # defenders_cards = self.model.kripke_model.player_knows_cards_of_player(this_player, defending_player)
-                defenders_cards = []
-                # TODO: convert the string cards to actual cards
+                defender = self.get_next_player()
+                kripke_defender = str(defender.get_id())
+                # kripke_defenders_cards = self.model.kripke_model.player_knows_cards_of_player(this_player, defending_player)
+                kripke_defenders_cards = []
+                defenders_cards = [c for c in defender.hand.cards if str(c) in kripke_defenders_cards]
                 highest_defending_card = None
+
+                # Calculate which card is the highest from all cards that you know the defender has
                 for c in defenders_cards:
                     if c.get_rank() > highest_defending_card.get_rank():
                         highest_defending_card = c
@@ -132,7 +127,6 @@ class Player(Agent):
                         card = winning_card
                     else:
                         card = self.hand.get_lowest_card()  # NO = Play your lowest card
-
                 else:
                     # You DONT know one or more cards of the defender
                     if self.get_next_player().get_number_of_cards_in_hand() == 1:  # NO = Does the defender only have one card?
