@@ -1,5 +1,6 @@
 from mlsolver.kripke import World, KripkeStructure
-from mlsolver.formula import *
+from mlsolver.formula import Implies, Not, And, Or
+from ourFormula import Atom
 import itertools
 from progress.bar import *
 
@@ -12,8 +13,8 @@ from progress.bar import *
 
 # TODO can we think of any more restrictions?
 def illegal_world(state_set, players, start_cards_per_player):
-    # Just testing
-    if len(state_set) < 10:
+    # Just testing, with 4 cards or less
+    if len(state_set) < 5:
         return False
 
     # Two cards go to the Discard pile at a time, so total count must be even
