@@ -9,18 +9,19 @@ from Inference import Inference
 import random
 from ourKripke import *
 
+
 class DurakModel(Model):
     """A model for the game of Durak with some number of players."""
 
     def __init__(
-        self, 
-        num_players = 3,
-        num_suits = 3,
-        num_cards_per_suit = 3,
-        num_starting_cards = 2,
-        player_strategies = ["normal", "random", "random"], 
-        player_depths = [1,1,1],
-        verbose = True):
+            self,
+            num_players=3,
+            num_suits=3,
+            num_cards_per_suit=3,
+            num_starting_cards=2,
+            player_strategies=["normal", "random", "random"],
+            player_depths=[1, 1, 1],
+            verbose=True):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -48,7 +49,8 @@ class DurakModel(Model):
 
         for i in range(self.num_players):
             # Create the players
-            player = Player(i, self, self.attack_fields, self.num_players, self.player_strategies[i], self.player_depths[i])
+            player = Player(i, self, self.attack_fields, self.num_players, self.player_strategies[i],
+                            self.player_depths[i])
             self.players.append(player)
             self.schedule.add(player)
 
@@ -90,20 +92,18 @@ class DurakModel(Model):
                 statement = Atom(kripke_player + str(card))
                 add_links(self.kripke_model, kripke_player, statement, self.reachable_worlds)
 
-
     def __repr__(self):
         '''
         Returns the representation of the entire model at the current state.
         '''
-        return "---------STATE----------\n"\
-            +"Deck: " + str(self.deck) \
-                + "\nTrump suit: " + self.deck.trump_suit \
-                        + "\n\nWinners: " + str(self.winners)\
-                            + "\n\nPlayers: " + str(self.players)\
-                                + "\n\nAttack fields: " + str(self.attack_fields)\
-                                    + "\n\nDiscard pile: " + str(self.discard_pile)\
-                                        + "\n------------------------"
-
+        return "---------STATE----------\n" \
+               + "Deck: " + str(self.deck) \
+               + "\nTrump suit: " + self.deck.trump_suit \
+               + "\n\nWinners: " + str(self.winners) \
+               + "\n\nPlayers: " + str(self.players) \
+               + "\n\nAttack fields: " + str(self.attack_fields) \
+               + "\n\nDiscard pile: " + str(self.discard_pile) \
+               + "\n------------------------"
 
     def step(self):
         '''
@@ -116,13 +116,11 @@ class DurakModel(Model):
         '''
         self.schedule.step(self, self.current_attacker, self.current_defender)
 
-
-
-
-    def add_common_knowledge(self, card, position): # position is "deck", "attack", "defend", or "discard" (maybe players as well?)
+    def add_common_knowledge(self, card,
+                             position):  # position is "deck", "attack", "defend", or "discard" (maybe players as well?)
         self.common_knowledge.append(KnowledgeFact("C", "", card, position))
 
-    def add_common_knowledge_num(self, num, position): # every player knows how many cards are where
+    def add_common_knowledge_num(self, num, position):  # every player knows how many cards are where
         self.common_knowledge.append(KnowledgeFact("C", "", num, position))
 
     def remove_old_hand_num_knowledge(self, knowledge):
@@ -134,8 +132,6 @@ class DurakModel(Model):
 
     def resolve_discard_pile(self):
         pass
-
-
 
     def return_winning_card(self, card1, card2):
         '''
@@ -165,7 +161,6 @@ class DurakModel(Model):
                 else:
                     return "tie"
 
-
     def resolve_attack(self, attacker, defender):
         '''
         Resolve the attack from the given attacker.
@@ -189,7 +184,7 @@ class DurakModel(Model):
             for i, attack_card in enumerate(attack_cards):
                 if self.return_winning_card(attack_card, defence_cards[i]) == attack_card:
                     attacker_wins = True
-        
+
         if attacker_wins:
             if self.verbose:
                 print("Player " + str(attacker.get_id()) + " won! The cards go to player " + str(defender.get_id()))
@@ -206,8 +201,10 @@ class DurakModel(Model):
                 kripke_defender = str(defender.get_id())
                 kripke_attack_card = str(attack_card)
                 kripke_defence_card = str(defend_card)
-                remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_attack_card), self.reachable_worlds)
-                remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_defence_card), self.reachable_worlds)
+                remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_attack_card),
+                             self.reachable_worlds)
+                remove_links(self.kripke_model, kripke_player, Atom(kripke_defender + kripke_defence_card),
+                             self.reachable_worlds)
 
 
         else:
@@ -218,7 +215,7 @@ class DurakModel(Model):
                 self.discard_pile.add_card(attack_card)
             for defend_card in defence_cards:
                 self.discard_pile.add_card(defend_card)
-            
+
             # Update the knowledge of all players
             # --> REMOVE relations to all worlds where the discard pile does not have those cards
             for player in self.players:
@@ -226,9 +223,10 @@ class DurakModel(Model):
                 kripke_discard_pile = "Discard"
                 kripke_attack_card = str(attack_card)
                 kripke_defence_card = str(defend_card)
-                remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_attack_card), self.reachable_worlds)
-                remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_defence_card), self.reachable_worlds)
-
+                remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_attack_card),
+                             self.reachable_worlds)
+                remove_links(self.kripke_model, kripke_player, Atom(kripke_discard_pile + kripke_defence_card),
+                             self.reachable_worlds)
 
         if self.deck.is_empty():
             # Check if the attacking player has won the game
@@ -321,7 +319,7 @@ class DurakModel(Model):
                 self.current_defender = defender.get_next_player()
                 if self.verbose:
                     print("It is now player " + str(self.current_attacker.get_id()) + "'s turn")
-        
+
         # Clear the attack field
         # self.test()
         field.clear()
@@ -336,7 +334,6 @@ class DurakModel(Model):
         for player in self.players:
             print(player.hand.get_cards_in_hand())
 
-
         print("END GAME STATE")
 
     def set_durak(self, durak):
@@ -350,19 +347,17 @@ class DurakModel(Model):
         Returns the current state of the game.
         '''
         game_state = {
-            "num_players" : self.num_players,
-            "num_suits" : self.num_suits,
-            "num_cards_per_suit" : self.num_cards_per_suit,
-            "num_starting_cards" : self.num_starting_cards,
-            "durak" : self.durak.get_id(),
-            "winners" : [winner.get_id() for winner in self.winners],
-    	    "player_strategies" : self.player_strategies,
-            "player_depths" : self.player_depths
+            "num_players": self.num_players,
+            "num_suits": self.num_suits,
+            "num_cards_per_suit": self.num_cards_per_suit,
+            "num_starting_cards": self.num_starting_cards,
+            "durak": self.durak.get_id(),
+            "winners": [winner.get_id() for winner in self.winners],
+            "player_strategies": self.player_strategies,
+            "player_depths": self.player_depths
         }
 
         return game_state
-
-
 
 
 def play(m):
@@ -373,15 +368,12 @@ def play(m):
     '''
 
     while not m.durak:
-        m.step()   
+        m.step()
         print(m)
-    
+
     return m.get_game_data()
 
-
     # Currently stops with an error b/c winning conditions still need to be implemented
-
-
 
 
 m = DurakModel(verbose=True)
@@ -391,5 +383,3 @@ m = DurakModel(verbose=True)
 play(m)
 
 # print(m.return_winning_card(m.players[0].hand.get_cards_in_hand()[0], m.players[1].hand.get_cards_in_hand()[0]))
-
-

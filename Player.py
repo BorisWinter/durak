@@ -6,6 +6,7 @@ import Moves
 import random
 from ourKripke import *
 
+
 class Player(Agent):
     """
     Models a player in the game of Durak
@@ -26,7 +27,6 @@ class Player(Agent):
         '''
         return "\n Player " + str(self.id) + "\n\t Hand : " + str(self.hand) + "\n"
 
-
     def get_number_of_cards_in_hand(self):
         '''
         Returns the number of cards in the player's hand
@@ -44,13 +44,11 @@ class Player(Agent):
 
         self.attack()
 
-
     def get_id(self):
         '''
         Returns the id of this player
         '''
         return self.id
-
 
     def get_next_player(self):
         '''
@@ -58,13 +56,11 @@ class Player(Agent):
         '''
         return self.next_player
 
-
     def set_next_player(self, player):
         '''
         Sets the next player after this one
         '''
         self.next_player = player
-
 
     def get_previous_player(self):
         '''
@@ -72,20 +68,17 @@ class Player(Agent):
         '''
         return self.previous_player
 
-
     def set_previous_player(self, player):
         '''
         Sets the previous player
         '''
         self.previous_player = player
 
-        
     def get_attack_field(self):
         '''
         Returns the attack field of this player
         '''
         return self.attack_field
-
 
     def set_attack_field(self, field):
         '''
@@ -93,13 +86,11 @@ class Player(Agent):
         '''
         self.attack_field = field
 
-
     def get_defence_field(self):
         '''
         Returns the defence field of this player
         '''
         return self.defence_field
-
 
     def set_defence_field(self, field):
         '''
@@ -107,14 +98,12 @@ class Player(Agent):
         '''
         self.defence_field = field
 
-
     def receive_card(self, card):
         '''
         Adds the specified card to the hand of the player
         '''
         self.hand.add_card(card)
 
-    
     def attack(self):
         '''
         Choose on or more cards and attack with them.
@@ -124,9 +113,9 @@ class Player(Agent):
         if self.strategy == "random":
             card = random.choice(self.hand.get_cards_in_hand())
         elif self.strategy == "normal":
-            #--------- Depth 1 ----------#
+            # --------- Depth 1 ----------#
             if self.knowledge_depth == 1:
-                
+
                 this_player = str(self.get_id())
                 defending_player = str(self.get_next_player().get_id())
                 # defenders_cards = self.model.kripke_model.player_knows_cards_of_player(this_player, defending_player)
@@ -142,15 +131,14 @@ class Player(Agent):
                     if winning_card:
                         card = winning_card
                     else:
-                        card = self.hand.get_lowest_card() # NO = Play your lowest card
+                        card = self.hand.get_lowest_card()  # NO = Play your lowest card
 
                 else:
                     # You DONT know one or more cards of the defender
-                    if self.get_next_player().get_number_of_cards_in_hand() == 1: # NO = Does the defender only have one card?
-                        card = self.hand.get_highest_card() # YES = Play your highest card
+                    if self.get_next_player().get_number_of_cards_in_hand() == 1:  # NO = Does the defender only have one card?
+                        card = self.hand.get_highest_card()  # YES = Play your highest card
                     else:
-                        card = self.hand.get_lowest_card() # NO = Play your lowest card
-
+                        card = self.hand.get_lowest_card()  # NO = Play your lowest card
 
         # Play the card(s)
         if card in self.hand.get_cards_in_hand():
@@ -162,14 +150,14 @@ class Player(Agent):
         kripke_attacker = str(self.get_id())
         kripke_defender = str(self.get_next_player().get_id())
         kripke_card = str(card)
-        remove_links(self.model.kripke_model, kripke_defender, Atom(kripke_attacker + kripke_card), self.model.reachable_worlds)
+        remove_links(self.model.kripke_model, kripke_defender, Atom(kripke_attacker + kripke_card),
+                     self.model.reachable_worlds)
 
         # print("REACHABLE WORLDS ======= " + str(len(self.model.reachable_worlds["0"]) + len(self.model.reachable_worlds["1"]) + len(self.model.reachable_worlds["2"])))
 
         # Print an attack statement
         if self.model.verbose:
             print("Player " + str(self.id) + " attacked with the " + str(card))
-
 
     def defend(self):
         '''
@@ -183,15 +171,14 @@ class Player(Agent):
         if self.strategy == "random":
             defending_card = random.choice(self.hand.get_cards_in_hand())
         elif self.strategy == "normal":
-            #--------- Depth 1 ----------#
+            # --------- Depth 1 ----------#
             if self.knowledge_depth == 1:
                 # Can you beat the attacking card?
-                winning_card = self.hand.get_lowest_card_that_wins_defence(attacking_card) 
+                winning_card = self.hand.get_lowest_card_that_wins_defence(attacking_card)
                 if winning_card:
-                    defending_card = winning_card # YES = Play lowest that beats that card
+                    defending_card = winning_card  # YES = Play lowest that beats that card
                 else:
-                    defending_card = self.hand.get_lowest_card() # NO = Play your lowest card
-
+                    defending_card = self.hand.get_lowest_card()  # NO = Play your lowest card
 
         # Play the card
         if defending_card in self.hand.get_cards_in_hand():
@@ -200,9 +187,8 @@ class Player(Agent):
 
         # Print a defence statement
         if self.model.verbose:
-            	print("Player " + str(self.id) + " defended with the " + str(defending_card))
+            print("Player " + str(self.id) + " defended with the " + str(defending_card))
 
-    
     def take_cards_from_deck(self, model, num):
         """
         Take a given number of cards from the deck in the hand.
@@ -215,5 +201,3 @@ class Player(Agent):
         """
         Returns a list with all cards in the player's hand that can beat the given card
         """
-
-        

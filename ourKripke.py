@@ -12,10 +12,14 @@ from progress.bar import *
 
 # TODO can we think of any more restrictions?
 def illegal_world(state_set, players, start_cards_per_player):
+    # Just testing
     if len(state_set) < 10:
         return False
+
+    # Two cards go to the Discard pile at a time, so total count must be even
     if not state_set.count('Discard') % 2 == 0:
         return True
+
     if state_set.count('Deck') > (len(state_set) - len(players) - start_cards_per_player):
         # print(state_set.count('Deck'))
         return True
@@ -25,10 +29,6 @@ def illegal_world(state_set, players, start_cards_per_player):
             # print("Look,", p, "has all the cards!")
             return True
     return False
-
-
-
-
 
 
 # Generates all possible worlds in the game for the given players and cards.
@@ -116,7 +116,7 @@ def remove_links(ks, player, statement, reachable):
 def add_links(ks, player, statement, reachable):
     print("Adding links...")
 
-    worlds_to_add = ks.nodes_not_follow_formula(statement)
+    worlds_to_add = ks.nodes_not_follow_formula(Not(statement))
     print("\t Number of worlds from/to which to add relations:", len(worlds_to_add))
     if len(worlds_to_add) < 20:
         print("\t Worlds from/to which to add relations:", worlds_to_add)
@@ -158,11 +158,15 @@ def dev_test():
     test_players = ['B', 'Deck']
     test_hand_players = ['B']
 
-    k_m, reachable_worlds = gen_kripke(gen_worlds(test_cards, test_players, test_hand_players), test_hand_players)
+    k_m, reachable_worlds = gen_empty_kripke(gen_worlds(test_cards, test_players, test_hand_players), test_hand_players)
     print("Reachable:", reachable_worlds)
     print("Full model:", k_m)
     # test_removed, reachable_worlds = remove_links(k_m, 'B', And(Not(Atom('B2C')), Atom('B2S')), reachable_worlds)
     test_added, reachable_worlds = add_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+    print(test_added, "of which reachable:", reachable_worlds)
+
+    # REMOVES all worlds in which formula is not True
+    print(test_added.solve(And(Atom('B2S'), Atom('B2C'))))
 
     # card_move(test_hand_players, 'B', 'B', '2S', k_m, reachable_worlds)
 
@@ -187,6 +191,6 @@ def demo_full():
 
 
 # demo_full()
-#dev_test()
+# dev_test()
 
 # print(list(itertools.product('ABCD', repeat=3)))
