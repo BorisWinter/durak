@@ -3,7 +3,7 @@ from mesa import Agent
 from Hand import Hand
 from KnowledgeFact import KnowledgeFact, KnowledgeDisjunct
 import random
-from ourKripke import *
+from newKripke import *
 
 
 class Player(Agent):

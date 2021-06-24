@@ -7,7 +7,7 @@ from DiscardPile import DiscardPile
 from KnowledgeFact import KnowledgeFact
 from Inference import Inference
 import random
-from ourKripke import *
+from newKripke import *
 
 
 class DurakModel(Model):
@@ -384,7 +384,6 @@ def play(m):
         print(m)
 
     return m.get_game_data()
-
 
 m = DurakModel(verbose=True)
 # print("Starting state...")
