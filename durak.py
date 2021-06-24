@@ -15,13 +15,15 @@ class DurakModel(Model):
 
     def __init__(
             self,
+            multiple = {},
             num_players=3,
             num_suits=3,
             num_cards_per_suit=3,
             num_starting_cards=2,
             player_strategies=["normal", "random", "random"],
             player_depths=[1, 1, 1],
-            verbose=True):
+            verbose=True,
+            multiple_runs = False):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -29,68 +31,123 @@ class DurakModel(Model):
         :param num_cards_per_suit: The number of cards per suit
         :param num_starting_cards: The number of cards that each player starts with
         '''
-        self.players = []
-        self.player_strategies = player_strategies
-        self.player_depths = player_depths
-        self.winners = []
-        self.durak = None
-        self.attack_fields = []
-        self.num_players = num_players
-        self.num_suits = num_suits
-        self.num_cards_per_suit = num_cards_per_suit
-        self.num_starting_cards = num_starting_cards
-        self.schedule = CustomStagedActivation(self)
-        self.inference_engine = Inference(verbose)
-        self.verbose = verbose
 
-        for i in range(self.num_players):
-            # Create the attack fields
-            self.attack_fields.append(AttackField())
+        if multiple:
+            '''
+            When running multiple games, all this is passed from experiments.ipynb
+            This makes running games with the same settings significantly faster
+            '''
+            self.players = []
+            self.winners = []
+            self.durak = None
+            self.attack_fields = []
 
-        for i in range(self.num_players):
-            # Create the players
-            player = Player(i, self, self.attack_fields, self.num_players, self.player_strategies[i],
-                            self.player_depths[i])
-            self.players.append(player)
-            self.schedule.add(player)
+            self.player_strategies = multiple["player_strategies"]
+            self.player_depths = multiple["player_depths"]
+            self.num_players = multiple["num_players"]
+            self.num_suits = multiple["num_suits"]
+            self.num_cards_per_suit = multiple["num_cards_per_suit"]
+            self.num_starting_cards = multiple["num_starting_cards"]
+            self.schedule = CustomStagedActivation(self)
+            self.verbose = verbose
 
-        for player in self.players:
-            # Set the order of play
-            player.set_next_player(self.players[(player.get_id() + 1) % num_players])
-            player.set_previous_player(self.players[(player.get_id() - 1) % num_players])
+            for i in range(self.num_players):
+                # Create the attack fields
+                self.attack_fields.append(AttackField())
 
-        # Create Common Knowledge
-        self.common_knowledge = []
+            for i in range(self.num_players):
+                # Create the players
+                player = Player(i, self, self.attack_fields, self.num_players, self.player_strategies[i],
+                                self.player_depths[i])
+                self.players.append(player)
+                self.schedule.add(player)
 
-        # Create the discard pile
-        self.discard_pile = DiscardPile()
-
-        # Create the deck and shuffle it
-        self.deck = Deck(num_suits, num_cards_per_suit)
-
-        # Create the initial Kripke model with all players and all cards in the deck
-        self.kripke_deck = [str(c) for c in self.deck.deck]
-        self.kripke_discard_pile = [str(c) for c in self.discard_pile.cards]
-        self.kripke_players = [str(p.get_id()) for p in self.players]
-        self.kripke_card_locations = ["Deck", "Discard"]
-        self.kripke_card_locations.extend(self.kripke_players)
-        self.kripke_worlds = gen_worlds(self.kripke_deck, self.kripke_card_locations, self.kripke_players)
-        self.kripke_model, self.reachable_worlds = gen_empty_kripke(self.kripke_worlds, self.kripke_players)
-
-        # Deal
-        for i in range(self.num_starting_cards):
             for player in self.players:
-                player.receive_card(self.deck.deal())
+                # Set the order of play
+                player.set_next_player(self.players[(player.get_id() + 1) % num_players])
+                player.set_previous_player(self.players[(player.get_id() - 1) % num_players])
 
-        # Select a random starting attacker and set the defender
-        self.current_attacker = random.choice(self.players)
-        self.current_defender = self.current_attacker.get_next_player()
+            # Create the discard pile
+            self.discard_pile = DiscardPile()
 
-        # Add the starting card knowledge to the Kripke model
-        for kripke_player in self.kripke_players:
-            for card in player.hand.get_cards_in_hand():
-                statement = Atom(kripke_player + str(card))
-                add_links(self.kripke_model, kripke_player, statement, self.reachable_worlds)
+            # Create the deck and shuffle it
+            self.deck = Deck(num_suits, num_cards_per_suit)
+
+            self.kripke_deck = []
+            self.kripke_discard_pile = []
+            self.kripke_players = []
+            self.kripke_card_locations = []
+            self.kripke_worlds = None
+            self.kripke_model = None
+            self.reachable_worlds = None
+        
+        else:
+            '''
+            Initialize all these values if we run a single game
+            '''
+            self.players = []
+            self.player_strategies = player_strategies
+            self.player_depths = player_depths
+            self.winners = []
+            self.durak = None
+            self.attack_fields = []
+            self.num_players = num_players
+            self.num_suits = num_suits
+            self.num_cards_per_suit = num_cards_per_suit
+            self.num_starting_cards = num_starting_cards
+            self.schedule = CustomStagedActivation(self)
+            # self.inference_engine = Inference(verbose)
+            self.verbose = verbose
+
+            for i in range(self.num_players):
+                # Create the attack fields
+                self.attack_fields.append(AttackField())
+
+            for i in range(self.num_players):
+                # Create the players
+                player = Player(i, self, self.attack_fields, self.num_players, self.player_strategies[i],
+                                self.player_depths[i])
+                self.players.append(player)
+                self.schedule.add(player)
+
+            for player in self.players:
+                # Set the order of play
+                player.set_next_player(self.players[(player.get_id() + 1) % num_players])
+                player.set_previous_player(self.players[(player.get_id() - 1) % num_players])
+
+            # Create the discard pile
+            self.discard_pile = DiscardPile()
+
+            # Create the deck and shuffle it
+            self.deck = Deck(num_suits, num_cards_per_suit)
+
+            # Create the initial Kripke model with all players and all cards in the deck
+            self.kripke_deck = [str(c) for c in self.deck.deck]
+            self.kripke_discard_pile = [str(c) for c in self.discard_pile.cards]
+            self.kripke_players = [str(p.get_id()) for p in self.players]
+            self.kripke_card_locations = ["Deck", "Discard"]
+            self.kripke_card_locations.extend(self.kripke_players)
+            self.kripke_worlds = gen_worlds(self.kripke_deck, self.kripke_card_locations, self.kripke_players)
+            self.kripke_model, self.reachable_worlds = gen_empty_kripke(self.kripke_worlds, self.kripke_players)
+
+            '''
+            This part of the initalization happens for every game, no matter how it was run. 
+            '''
+            # Deal
+            for i in range(self.num_starting_cards):
+                for player in self.players:
+                    player.receive_card(self.deck.deal())
+
+            # Select a random starting attacker and set the defender
+            self.current_attacker = random.choice(self.players)
+            self.current_defender = self.current_attacker.get_next_player()
+
+            # Add the starting card knowledge to the Kripke model
+            for kripke_player in self.kripke_players:
+                for card in player.hand.get_cards_in_hand():
+                    statement = Atom(kripke_player + str(card))
+                    add_links(self.kripke_model, kripke_player, statement, self.reachable_worlds)
+
 
     def __repr__(self):
         '''
@@ -385,8 +442,8 @@ def play(m):
 
     return m.get_game_data()
 
-m = DurakModel(verbose=True)
+# m = DurakModel(verbose=True)
 # print("Starting state...")
 # print(m)
 # print("Play! ")
-play(m)
+# play(m)
