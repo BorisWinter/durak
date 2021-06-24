@@ -1,0 +1,3 @@
+,num_players,num_suits,num_cards_per_suit,num_starting_cards,durak,winners,player_strategies,player_depths
+game0,3,3,3,2,2,"[1, 0]","['normal', 'random', 'random']","[1, 1, 1]"
+game1,3,3,3,2,2,"[0, 1]","['normal', 'random', 'random']","[1, 1, 1]"
