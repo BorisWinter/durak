@@ -127,7 +127,8 @@ class DurakModel(Model):
             self.kripke_players = [str(p.get_id()) for p in self.players]
             self.kripke_card_locations = ["Deck", "Discard"]
             self.kripke_card_locations.extend(self.kripke_players)
-            self.kripke_worlds = gen_worlds(self.kripke_deck, self.kripke_card_locations, self.kripke_players)
+            self.kripke_worlds = gen_worlds(self.kripke_deck, self.kripke_card_locations, self.kripke_players,
+                                            self.num_starting_cards)
             self.kripke_model, self.reachable_worlds = gen_empty_kripke(self.kripke_worlds, self.kripke_players)
 
             '''
@@ -145,7 +146,8 @@ class DurakModel(Model):
         # Add the starting card knowledge to the Kripke model
         for player in self.players:
             kripke_player = str(player.get_id())
-            statement = make_statement_cards(self.deck.initial_deck, player.hand.get_cards_in_hand(), kripke_player)
+            statement = make_statement_cards(self.deck.initial_deck, player.hand.get_cards_in_hand(), kripke_player,
+                                             True, len(self.deck.deck))
             self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
                                                                  statement, self.reachable_worlds)
 

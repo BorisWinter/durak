@@ -38,9 +38,10 @@ def illegal_world(state_set, players, start_cards_per_player):
     # Two cards go to the Discard pile at a time, so total count must be even
     if not state_set.count('Discard') % 2 == 0:
         return True
-    print(state_set.count('Deck'))
+    # print(state_set.count('Deck'))
     if state_set.count('Deck') > (len(state_set) - (len(players) * start_cards_per_player)):
-        print(state_set.count('Deck'))
+        # print("MAX", len(state_set) - (len(players) * start_cards_per_player))
+        # print(state_set.count('Deck'))
         return True
     for p in players:
         # one player has all the cards (TODO only removes three states)
@@ -50,7 +51,7 @@ def illegal_world(state_set, players, start_cards_per_player):
     return False
 
 
-def gen_worlds(cards, players, hand_players):
+def gen_worlds(cards, players, hand_players, start_cards_per_player):
     """
     Generates all possible worlds in the game for the given players and cards.
     """
@@ -60,7 +61,7 @@ def gen_worlds(cards, players, hand_players):
     worlds = []
     bar = Bar('Generating worlds', max=len(locations)/2, suffix='%(percent)d%%')
     for i, state_set in enumerate(locations):
-        if not illegal_world(state_set, hand_players, 2):
+        if not illegal_world(state_set, hand_players, start_cards_per_player):
             # print(i)
             d = {place + cards[j]: True for j, place in enumerate(state_set)}
             w = World(str(i), d)
@@ -122,24 +123,34 @@ def remove_links(ks, player, statement, reachable):
             reachable[player].remove(w)
     # reachable[player] = list(set(reachable[player]).difference(set(worlds_where_false)))
 
-
     return ks, reachable
 
 
-def make_statement_cards(all_cards, true_cards, player_name):
+def make_statement_cards(all_cards, true_cards, player_name, start, deck_size):
     '''
-
-    :param all_cards:
-    :param true_cards:
-    :param player_name:
-    :return:
+    Makes a big statement of all cards a player has,
+    plus if called at the start of the game,
+    the size of the deck and discard pile.
     '''
     statements = []
+
     for card in all_cards:
         if card not in true_cards:
-            statements.append(Not(Atom(player_name + str(card))))
+            statements.append(Not(Atom(player_name + str(card))))  # cards that are not said to be in the player's hand
         else:
-            statements.append(Atom(player_name + str(card)))
+            statements.append(Atom(player_name + str(card)))  # cards that are said to be in the player's hand
+        if start:
+            statements.append(Not(Atom('Discard'+str(card))))  # discard pile empty
+
+            # Deck can have only the allowed size, not less
+            allowed_on_deck = list(itertools.combinations([c for c in all_cards if c not in true_cards], deck_size))
+            deck_statements = And(Atom('Deck' + str(allowed_on_deck[0][0])), Atom('Deck' + str(allowed_on_deck[0][1])))
+            for (c1, c2) in allowed_on_deck[1:]:
+                deck_statements = Or(deck_statements, (And(Atom('Deck' + str(c1)), Atom('Deck' + str(c2)))))
+
+            statements.append(deck_statements)
+
+    # All of these negations of statements must be true
     big_conj = statements[0]
     for s in statements[1:]:
         big_conj = And(big_conj, s)
