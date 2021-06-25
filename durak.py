@@ -144,11 +144,13 @@ class DurakModel(Model):
 
         # Add the starting card knowledge to the Kripke model
         for player in self.players:
-            kripke_player = str(player.get_id())
-            for card in player.hand.get_cards_in_hand():
-                statement = Atom(kripke_player + str(card))
-                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model,
-                                                                     kripke_player, statement, self.reachable_worlds)
+            statement = make_statement_cards(self.deck.initial_deck, player.hand.get_cards_in_hand, player.get_id())
+
+            # kripke_player = str(player.get_id())
+            # for card in player.hand.get_cards_in_hand():
+            #     statement = Atom(kripke_player + str(card))
+            self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                                                                 statement, self.reachable_worlds)
 
 
     def __repr__(self):

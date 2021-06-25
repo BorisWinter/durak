@@ -132,6 +132,26 @@ def remove_links(ks, player, statement, reachable):
     return ks, reachable
 
 
+def make_statement_cards(all_cards, true_cards, player_name):
+    '''
+
+    :param all_cards:
+    :param true_cards:
+    :param player_name:
+    :return:
+    '''
+    statements = []
+    for card in all_cards:
+        if card not in true_cards:
+            statements.append(Not(Atom(player_name + str(card))))
+        else:
+            statements.append(Atom(player_name + str(card)))
+    big_conj = statements[0]
+    for s in statements[1:]:
+        big_conj = And(big_conj, s)
+    return big_conj
+
+
 def add_links(ks, player, statement, reachable):
     """
     Add all links for the given player to/from worlds
@@ -221,7 +241,7 @@ def dev_test():
     # Development sets
     full_numbers = ['2', '3', '4']
     full_suits = ['S', 'C', 'H']
-    test_cards = ['2S', '2C']
+    test_cards = ['2S', '2C', '2H']
     test_players = ['B', 'Deck']
     test_hand_players = ['B']
 
@@ -229,16 +249,22 @@ def dev_test():
     print("Reachable:", reachable_worlds)
     print("Full model:", k_m)
 
-    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-    test_added, reachable_worlds = add_links(k_m, 'B', Atom('B2S'), reachable_worlds)
-    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-    print(reachable_worlds['B'])
-    test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('Deck2C'), reachable_worlds)
-    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-    print(reachable_worlds['B'])
+    statement = make_statement_cards(test_cards, ['2S', '2C'], 'B')
+    print(statement)
 
-    # knowledge_base('B', reachable_worlds)
-    player_knows_cards_of_player('B', reachable_worlds, 'Deck')
+    print(k_m.solve(statement))
+
+    # print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    # test_added, reachable_worlds = add_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+    # print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    # print(reachable_worlds['B'])
+    # test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('Deck2C'), reachable_worlds)
+    # print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    # print(reachable_worlds['B'])
+    #
+    # # knowledge_base('B', reachable_worlds)
+    # player_knows_cards_of_player('B', reachable_worlds, 'Deck')
+
     # REMOVES all worlds in which formula is not True
     # print(test_added.solve(And(Atom('B2S'), Atom('B2C'))))
 
@@ -277,6 +303,8 @@ def demo_full():
 # d_1.update(d_2)
 # print(d_1)
 #
+
+
 
 
 
