@@ -226,7 +226,7 @@ def knowledge_base(player, reachable):
     number = len(playerKnowledge)
     # print("Player", player.get_id(), "knows:")
     for w in reachable[str(player.get_id())]:
-        # print(w)
+        # print("Reachable", w)
         if playerKnowledge.issubset(set(list(w.assignment.keys()))) and sum(str(player.get_id()) in s for s in list(w.assignment.keys())) == number:
 
             my_list.append(set(list(w.assignment.keys())))

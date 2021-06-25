@@ -293,15 +293,20 @@
                   other player.
                 </p>
 
-                <p>To add, how we derive knowledge from our Kripke model.</p>
+                <p>In our implementation, a player can derive knowledge from the Kripke
+                either for all other players (including Deck and Discard), or for a single player.
+                It can be used to update the knowledge with a given new card, or the removal of
+                a card from that player's hand. Moreover, a player can use the knowledge of another
+                player's cards in order to choose which card to attack with. </p>
 
-                <p>insert latex illustration here, to build.</p>
+
+<!--                <p>insert latex illustration here, to build.</p>-->
               </div>
 
               <div class="content">
                 <h2>Common Knowledge</h2>
                 <p>
-                  In Durak, there is a lot of common knowledge. When players
+                  In Durak, most of the knowledge is common knowledge due to public announcements. When players
                   attack, the attacking and defending cards become common
                   knowledge, and the result of the attack (card to discard pile,
                   or card to defending player) also becomes common knowledge.
@@ -309,35 +314,32 @@
                   player always knows its location from that moment on. The
                   players can use this common knowledge to reason with.
                 </p>
-
-                <p>
-                  To add, how we derive common knowledge from our Kripke model.
-                </p>
               </div>
 
               <div class="content">
-                <h2>Updating the Kripke Model</h2>
-                <p>
-                  Not sure if this is public announcement or something
-                  different. Maybe it's just a run. In any case, the state of
-                  the game changes every turn, as cards switch hands.
-                </p>
+<!--                <h2>Updating the Kripke Model</h2>-->
+<!--                <p>-->
+<!--                  Not sure if this is public announcement or something-->
+<!--                  different. Maybe it's just a run. In any case, the state of-->
+<!--                  the game changes every turn, as cards switch hands.-->
+<!--                </p>-->
 
-                <hr class="major" />
+<!--                <hr class="major" />-->
 
                 <h2>Limitations</h2>
                 <p>
-                  Playing with a greater hand limit, more use for higher-order
-                  knowledge in the strategies
+                  Playing with a greater hand limit, with more use for higher-order
+                  knowledge in the strategies, was something that unfortunately took
+                  too much runtime due to exploding complexity and programming limitations.
+
+                  Moreover, the implementation of second- and higher-order knowledge
+                  was something we wanted to add, but failed to do because of some
+                  earlier bugs in the programs.
                 </p>
 
                 <p>
-                  Higher-order knowledge - we could think of strategies that
-                  involve higher order knowledge.
-                </p>
-
-                <p>
-                  Probabilistic inference on possible cards. The player now does
+                  Lastly, a limitation of our implementation is the
+                  probabilistic inference on possible cards. The player now does
                   not consider possible cards, only the cards that it knows for
                   sure. Extending this with either heuristic or formal
                   probabilistic epistemic method and taking these into accounts
@@ -368,13 +370,10 @@
                 <div class="col-6 col-12-small">
                   <h3>MLSolver</h3>
                   <p>
-                    In arcu accumsan arcu adipiscing accumsan orci ac. Felis id
-                    enim aliquet. Accumsan ac integer lobortis commodo ornare
-                    aliquet accumsan erat tempus amet porttitor. Ante commodo
-                    blandit adipiscing integer semper orci eget. Faucibus
-                    commodo adipiscing mi eu nullam accumsan morbi arcu ornare
-                    odio mi adipiscing nascetur lacus ac interdum morbi accumsan
-                    vis mi accumsan.
+                    The structures used in our project code to represent a Kripke model are based on
+                    the library <a href="https://github.com/erohkohl/mlsolver" target="_blank">msolver</a>.
+                    Since the solver in this library removes worlds from a model, instead of removing the links to them,
+                    we have adapted some of its definitions to better fit our own purposes.
                   </p>
                 </div>
               </div>
