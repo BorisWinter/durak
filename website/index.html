@@ -262,7 +262,24 @@
 
               <p>
                 These properties imply that our model is an S5 model. Hence, we
-                can use S5 inference rules in our model.
+                can use S5 inference rules in our model. In our implementation,
+                this means that we do not specify the links between worlds explicitly -
+                we only consider the worlds that are "reachable" by a player from
+                the current game state - a naive version of the equivalence classes
+                we discussed in the course. Hence, we do not have to specify the relations
+                between the "reachable worlds", since we know that they are transitive,
+                symmetric and reflexive, hence, euclidean, and that for every world in
+                "reachable worlds", it is connected to every other reachable world.
+                This allows us to represent the worlds as a "reachable worlds" list
+                per player in a given state, instead of a full Kripke model
+                with relations.
+
+                <span class="image center"
+                  ><img src="images/reachableWorlds.jpeg" alt=""
+                /></span>
+
+
+
               </p>
 
               <div class="content">
