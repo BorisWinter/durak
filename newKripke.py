@@ -61,8 +61,8 @@ def gen_worlds(cards, players, hand_players):
     Generates all possible worlds in the game for the given players and cards.
     """
     # TODO the first is correct, but generates SO MANY WORLDS
-    # locations = list(itertools.product(players, repeat=len(cards)))
-    locations = list(itertools.combinations_with_replacement(players, len(cards)))
+    locations = list(itertools.product(players, repeat=len(cards)))
+    #locations = list(itertools.combinations_with_replacement(players, len(cards)))
     worlds = []
     bar = Bar('Generating worlds', max=len(locations)/2, suffix='%(percent)d%%')
     for i, state_set in enumerate(locations):
@@ -116,13 +116,13 @@ def remove_links(ks, player, statement, reachable):
     Remove all links for the given player to/from ALL
     worlds in which the given statement is TODO FALSE.
     """
-    print("Removing links...")
+    #print("Removing links...")
     worlds_where_false = false_in_worlds(ks, statement, reachable, player, True)
-    print("\t Number of worlds from/to which to remove relations (incl. already unreachable):", len(worlds_where_false))
-    if len(worlds_where_false) < 20:
-        print("\t Worlds from/to which to remove relations:", [w.name for w in worlds_where_false])
+    #print("\t Number of worlds from/to which to remove relations (incl. already unreachable):", len(worlds_where_false))
+    #if len(worlds_where_false) < 20:
+        #print("\t Worlds from/to which to remove relations:", [w.name for w in worlds_where_false])
 
-    # worlds_to_remove = []
+    worlds_to_remove = []
     for w in worlds_where_false:
         if w in reachable[player]:
             reachable[player].remove(w)
@@ -137,12 +137,12 @@ def add_links(ks, player, statement, reachable):
     Add all links for the given player to/from worlds
     in which the given statement is TODO TRUE.
     """
-    print("Adding links...")
+    #print("Adding links...")
 
     worlds_to_add = false_in_worlds(ks, Not(statement), reachable, player, False)
-    print("\t Number of worlds from/to which to add relations:", len(worlds_to_add))
-    if len(worlds_to_add) < 20:
-        print("\t Worlds from/to which to add relations:", [w.name for w in worlds_to_add])
+    #print("\t Number of worlds from/to which to add relations:", len(worlds_to_add))
+    #if len(worlds_to_add) < 20:
+        #print("\t Worlds from/to which to add relations:", [w.name for w in worlds_to_add])
 
     new_worlds = []
     for w in worlds_to_add:
@@ -167,26 +167,52 @@ def add_links(ks, player, statement, reachable):
 
 
 def knowledge_base(player, reachable):
-    my_list = [set(list(w.assignment.keys())) for w in reachable[player]]
-    # print(my_list)
+    print("PLAYER", player.get_id())
+    print(player.hand)
+    concetting = []
+    my_list = []
+    for item in player.hand.get_cards_in_hand():
+        concetting.append(str(player.get_id())+str(item))
+
+    playerKnowledge = set(concetting)
+    number = len(playerKnowledge)
+    for w in reachable[str(player.get_id())]:
+        print(w)
+        if playerKnowledge.issubset(set(list(w.assignment.keys()))) and sum(str(player.get_id()) in s for s in list(w.assignment.keys())) == number:
+
+            my_list.append(set(list(w.assignment.keys())))
+        #set(list(w.assignment.keys()))
+    #my_list = [set(list(w.assignment.keys())) for w in reachable[str(player.get_id())]]
+    for item in my_list:
+
+        print(item)
+        print("\n")
+
+    #print("worlds in possible words")
+    #print(my_list)
     if len(my_list):
         my_set = my_list[0]
         for w in my_list[1:]:
             my_set = my_set.intersection(w)
-        print("Player knows:", my_set)
+            print(my_set)
+        print("Player " + str(player.get_id()) + " knows:", my_set)
 
         return my_set
     else:
-        return {}
+        return set()
 
 
 def player_knows_cards_of_player(player, reachable, about_player):
+    print("IN HERE")
     all_info = knowledge_base(player, reachable)
     known_cards = []
     for k in all_info:
-        if k[:-2] == about_player:
-            known_cards.append(k[-2:])
-    print(f"Player {player} knows that player {about_player} has:", known_cards)
+        print(k)
+        if k[0] == about_player:    # now breaks for pure kripke dev
+            print(k[1:])
+            print(type(k[1:]))
+            known_cards.append(k[1:])
+    print(f"Player {player.get_id()} knows that player {about_player} has:", known_cards)
 
     return known_cards
 
