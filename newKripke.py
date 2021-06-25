@@ -20,12 +20,12 @@ def true_in_worlds(ks, formula, reachable, player, remove):
      is not satisfiable
     """
     nodes_that_follow_formula = []
-    bar = Bar(f'Checking worlds for {formula} being FALSE', max=len(ks.worlds))
+    # bar = Bar(f'Player {player} is checking worlds for {formula} being TRUE', max=len(ks.worlds))
     for w in ks.worlds:
         if formula.semantic(ks, w) is True:
             # if not remove or (remove and w.name in reachable[player]):
             nodes_that_follow_formula.append(w)
-    bar.finish()
+    # bar.finish()
     return nodes_that_follow_formula
 
 
@@ -126,7 +126,8 @@ def remove_links(ks, player, statement, reachable):
     return ks, reachable
 
 
-def make_statement_cards(all_cards, true_cards, player_name, start, deck_size):
+def make_statement_cards(all_cards, true_cards, player_name, start, deck_size, discard_size):
+    print("TRUE CARDS:", true_cards, player_name)
     '''
     Makes a big statement of all cards a player has,
     plus if called at the start of the game,
@@ -135,31 +136,44 @@ def make_statement_cards(all_cards, true_cards, player_name, start, deck_size):
     statements = []
 
     for card in all_cards:
-        if card not in true_cards:
+        if player_name + str(card) not in true_cards:
             statements.append(Not(Atom(player_name + str(card))))  # cards that are not said to be in the player's hand
         else:
             statements.append(Atom(player_name + str(card)))  # cards that are said to be in the player's hand
+        # statements.append(Not(Atom('Discard'+str(card))))  # discard pile empty
+
         if start:
-            statements.append(Not(Atom('Discard'+str(card))))  # discard pile empty
-
             # Deck can have only the allowed size, not less
-            allowed_on_deck = list(itertools.combinations([c for c in all_cards if c not in true_cards], deck_size))
-
-            # single_deck_statement = Atom('Deck' + str(allowed_on_deck[0][0]))
-            # for j in range(1, deck_size):
-            #     single_deck_statement = And(single_deck_statement, Atom('Deck' + str(allowed_on_deck[0][j])))
-            # deck_statements = single_deck_statement
-
-            for i in range(0, len(allowed_on_deck)):
-                single_deck_statement = Atom('Deck' + str(allowed_on_deck[i][0]))
-                for j in range(1, deck_size):
-                    single_deck_statement = And(single_deck_statement, Atom('Deck' + str(allowed_on_deck[i][j])))
-                if i == 0:
-                    deck_statements = single_deck_statement
-                else:
-                    deck_statements = Or(deck_statements, single_deck_statement)
-
-            statements.append(deck_statements)
+            allowed_on_deck = list(itertools.combinations([c for c in all_cards if player_name+str(c) not in true_cards], deck_size))
+            allowed_on_discard = list(itertools.combinations([c for c in all_cards if player_name+str(c) not in true_cards], discard_size))
+            if len(allowed_on_deck) == 0 or allowed_on_deck[0] == ():
+                statements.append(Not(Atom('Deck' + str(card))))  # deck empty
+            else:
+                for i in range(0, len(allowed_on_deck)):
+                    single_deck_statement = Atom('Deck' + str(allowed_on_deck[i][0]))
+                    for j in range(1, deck_size):
+                        single_deck_statement = And(single_deck_statement, Atom('Deck' + str(allowed_on_deck[i][j])))
+                    if i == 0:
+                        deck_statements = single_deck_statement
+                    else:
+                        deck_statements = Or(deck_statements, single_deck_statement)
+                statements.append(deck_statements)
+            if len(allowed_on_discard) == 0 or allowed_on_discard[0] == ():
+                statements.append(Not(Atom('Discard' + str(card))))  # discard pile empty
+            else:
+                print("---------------------------------------------")
+                for i in range(0, len(allowed_on_discard)):
+                    print("\t\t Allowed on discard:", allowed_on_discard[i])
+                    single_discard_statement = Atom('Discard' + str(allowed_on_discard[i][0]))
+                    for j in range(1, discard_size):
+                        single_discard_statement = And(single_discard_statement, Atom('Discard' + str(allowed_on_discard[i][j])))
+                    if i == 0:
+                        discard_statements = single_discard_statement
+                    else:
+                        discard_statements = Or(discard_statements, single_discard_statement)
+                statements.append(discard_statements)
+        # else:
+        #     print("\t\t\t STATEMENTS", [str(s) for s in statements])
 
     # All of these negations of statements must be true
     big_conj = statements[0]
@@ -203,25 +217,24 @@ def add_links(ks, player, statement, reachable):
 
 
 def knowledge_base(player, reachable):
-    print("PLAYER", player.get_id())
-    print(player.hand)
-    concetting = []
+    print("PLAYER", str(player.get_id()), "has hand", player.hand)
+    # print("Above player has worlds:", [w.assignment for w in reachable[str(player.get_id())]])
+    concatting = [str(player.get_id())+str(item) for item in player.hand.get_cards_in_hand()]
     my_list = []
-    for item in player.hand.get_cards_in_hand():
-        concetting.append(str(player.get_id())+str(item))
 
-    playerKnowledge = set(concetting)
+    playerKnowledge = set(concatting)
     number = len(playerKnowledge)
+    # print("Player", player.get_id(), "knows:")
     for w in reachable[str(player.get_id())]:
-        print(w)
+        # print(w)
         if playerKnowledge.issubset(set(list(w.assignment.keys()))) and sum(str(player.get_id()) in s for s in list(w.assignment.keys())) == number:
 
             my_list.append(set(list(w.assignment.keys())))
         #set(list(w.assignment.keys()))
     #my_list = [set(list(w.assignment.keys())) for w in reachable[str(player.get_id())]]
-    for item in my_list:
-
-        print(item)
+    # for item in my_list:
+    #
+    #     print("Hi", item)
 
 
     #print("worlds in possible words")
@@ -230,24 +243,31 @@ def knowledge_base(player, reachable):
         my_set = my_list[0]
         for w in my_list[1:]:
             my_set = my_set.intersection(w)
-            print(my_set)
+            # print(my_set)
         print("Player " + str(player.get_id()) + " knows:", my_set)
-
         return my_set
     else:
         return set()
 
 
+# def get_info_cards
+
+
 def player_knows_cards_of_player(player, reachable, about_player):
-    print("IN HERE")
+    # print("IN HERE for player", player.get_id())
     all_info = knowledge_base(player, reachable)
     known_cards = []
     for k in all_info:
-        print(k)
+        # print("\t\t\t\t K IS NOW", k, "with card", str(k[:7]))
         if k[0] == about_player:    # now breaks for pure kripke dev
-            print(k[1:])
-            print(type(k[1:]))
+            # print(k[1:])
+            # print(type(k[1:]))
             known_cards.append(str(k[1:]))
+        elif about_player == 'Discard' and str(k[:7]) == about_player:
+            known_cards.append(str(k[7:]))
+            print("\t\t\t\tDiscard has", str(k[7:]))
+        elif about_player == 'Deck' and str(k[:4]) == about_player:
+            known_cards.append(str(k[4:]))
     print(f"Player {player.get_id()} knows that player {about_player} has:", known_cards)
 
     return known_cards

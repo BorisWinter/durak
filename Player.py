@@ -153,6 +153,7 @@ class Player(Agent):
         kripke_attacker = str(self.get_id())
         kripke_defender = str(self.get_next_player().get_id())
         kripke_card = str(card)
+        print("\t (in Player) removing links for attacker", kripke_attacker, "defender", kripke_defender, "and card", kripke_card)
         remove_links(self.model.kripke_model, kripke_defender, Atom(kripke_attacker + kripke_card),
                      self.model.reachable_worlds)
 

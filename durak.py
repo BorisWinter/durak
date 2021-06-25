@@ -15,7 +15,7 @@ class DurakModel(Model):
 
     def __init__(
             self,
-            multiple = {},
+            multiple={},
             num_players=2,
             num_suits=2,
             num_cards_per_suit=2,
@@ -23,7 +23,7 @@ class DurakModel(Model):
             player_strategies=["normal", "normal"],
             player_depths=[1, 1],
             verbose=True,
-            multiple_runs = False):
+            multiple_runs=False):
         '''
         Initialize the game
         :param num_players: The number of players for this game
@@ -146,11 +146,11 @@ class DurakModel(Model):
         # Add the starting card knowledge to the Kripke model
         for player in self.players:
             kripke_player = str(player.get_id())
-            statement = make_statement_cards(self.deck.initial_deck, player.hand.get_cards_in_hand(), kripke_player,
-                                             True, len(self.deck.deck))
+            statement = make_statement_cards(self.deck.initial_deck, [kripke_player + str(c) for c in player.hand.get_cards_in_hand()], kripke_player,
+                                             True, len(self.deck.deck), len(self.discard_pile.cards))
+            # print("cards are", player.hand.get_cards_in_hand())
             self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
                                                                  statement, self.reachable_worlds)
-
 
     def __repr__(self):
         '''
@@ -256,28 +256,37 @@ class DurakModel(Model):
                 defender.receive_card(defend_card)
 
             # Update the knowledge of all players
-            # --> ADD relations to all worlds where the defender does have those cards
-            # TODO: Limited by the current knowledge state
             for player in self.players:
                 kripke_player = str(player.get_id())
                 kripke_defender = str(defender.get_id())
+                kripke_attacker = str(attacker.get_id())
                 kripke_attack_card = str(attack_card)
                 kripke_defence_card = str(defend_card)
-                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
-                                                    Atom(kripke_defender + kripke_attack_card), self.reachable_worlds)
-                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
-                                                    Atom(kripke_defender + kripke_defence_card), self.reachable_worlds)
 
-            # --> REMOVE relations to all worlds where the defender does not have those cards
-            for player in self.players:
-                kripke_player = str(player.get_id())
-                kripke_defender = str(defender.get_id())
-                kripke_attack_card = str(attack_card)
-                kripke_defence_card = str(defend_card)
+                # known_cards_attacker = list(player_knows_cards_of_player(player, self.reachable_worlds, kripke_attacker))
+                # known_cards_attacker.remove(kripke_attacker + kripke_attack_card)
+                # statement = make_statement_cards(self.deck.initial_deck, known_cards_list, kripke_player,
+                #                                  len(self.deck.deck), len(self.discard_pile.cards))
+                #
+                # self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                #                                                      statement, self.reachable_worlds)
+                # self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                #                                                         statement, self.reachable_worlds)
+                print("Updating model after unsuccessful defense")
+                # known_cards_defender = list(player_knows_cards_of_player(player, self.reachable_worlds, kripke_defender))
+                known_cards_defender = list(knowledge_base(player, self.reachable_worlds))
+                known_cards_defender.append(kripke_defender + kripke_defence_card)
+                known_cards_defender.append(kripke_defender + kripke_attack_card)
+                print("YOEEEEEEEEEEEEEEEEEEEHOEEEEEEEEEEEEEEEEEEEEEEE", known_cards_defender)
+                statement = make_statement_cards(self.deck.initial_deck, known_cards_defender, kripke_defender,
+                                                 False, len(self.deck.deck), len(self.discard_pile.cards))
+                statement = And(statement, Not(Atom(kripke_attacker + kripke_attack_card)))
+                print("Statement:", statement)
+
+                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                                                                     statement, self.reachable_worlds)
                 self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
-                                                    Atom(kripke_defender + kripke_attack_card), self.reachable_worlds)
-                self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
-                                                    Atom(kripke_defender + kripke_defence_card), self.reachable_worlds)
+                                                                        statement, self.reachable_worlds)
 
         # Resolving of the attack if the defender wins
         else:
@@ -293,13 +302,60 @@ class DurakModel(Model):
             # --> REMOVE relations to all worlds where the discard pile does not have those cards
             for player in self.players:
                 kripke_player = str(player.get_id())
+                kripke_attacker = str(attacker.get_id())
+                kripke_defender = str(defender.get_id())
                 kripke_discard_pile = "Discard"
                 kripke_attack_card = str(attack_card)
                 kripke_defence_card = str(defend_card)
+
+                # known_cards_attacker = list(player_knows_cards_of_player(player, self.reachable_worlds, kripke_attacker))
+                # print("testing...")
+                # if (kripke_attacker + kripke_attack_card) in known_cards_attacker:
+                #     known_cards_attacker.remove(kripke_attacker + kripke_attack_card)
+                #     statement = make_statement_cards(self.deck.initial_deck, known_cards_attacker, kripke_player,
+                #                                      len(self.deck.deck), len(self.discard_pile.cards))
+                #
+                #     self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                #                                                          statement, self.reachable_worlds)
+                #     self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                #                                                             statement, self.reachable_worlds)
+
+                print("Updating model after successful defense YAY")
+
+                # known_cards_discard = list(player_knows_cards_of_player(player, self.reachable_worlds, kripke_discard_pile))
+                known_cards_discard = list(knowledge_base(player, self.reachable_worlds))
+                # print("known cards on discard pile:", known_cards_discard)
+                known_cards_discard.append(kripke_discard_pile + kripke_defence_card)
+                known_cards_discard.append(kripke_discard_pile + kripke_attack_card)
+                # print("\t\t\t now We know: ", known_cards_discard)
+                statement = make_statement_cards(self.deck.initial_deck, known_cards_discard, kripke_discard_pile,
+                                                 False, len(self.deck.deck), len(self.discard_pile.get_all_cards()))
+
+
+                # statement.append(Not(Atom(kripke_attacker + kripke_attack_card)))
+                statement = And(statement, Not(Atom(kripke_attacker + kripke_attack_card)))
+                statement = And(statement, Not(Atom(kripke_defender + kripke_defence_card)))
+                print("Statement:", statement)
+
+                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                                                                     statement, self.reachable_worlds)
                 self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
-                                                Atom(kripke_discard_pile + kripke_attack_card), self.reachable_worlds)
-                self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
-                                                Atom(kripke_discard_pile + kripke_defence_card), self.reachable_worlds)
+                                                                        statement, self.reachable_worlds)
+                # print("\t\t\t AFTER UPDATING")
+                # now_known = list(player_knows_cards_of_player(player, self.reachable_worlds, kripke_discard_pile))
+
+                # self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                #                                                      Atom(kripke_discard_pile + kripke_attack_card),
+                #                                                      self.reachable_worlds)
+                # self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                #                                                      Atom(kripke_discard_pile + kripke_defence_card),
+                #                                                      self.reachable_worlds)
+                # self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                #                                                         Atom(kripke_discard_pile + kripke_attack_card),
+                #                                                         self.reachable_worlds)
+                # self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                #                                                         Atom(kripke_discard_pile + kripke_defence_card),
+                #                                                         self.reachable_worlds)
 
         # If the deck is empty, no cards can be taken: check if there are winners
         if self.deck.is_empty():
@@ -356,6 +412,17 @@ class DurakModel(Model):
             if num_cards_attacker < self.num_starting_cards:
                 attacker.take_cards_from_deck(self, self.num_starting_cards - num_cards_attacker)
 
+                # Update the knowledge of attacker
+                kripke_player = str(attacker.get_id())
+                statement = make_statement_cards(self.deck.initial_deck, [kripke_player + str(c) for c in attacker.hand.get_cards_in_hand()],
+                                                 kripke_player, False, len(self.deck.deck), len(self.discard_pile.cards))
+                print("Updating model after attacker draws")
+                print("Statement:", statement)
+                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                                                                     statement, self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                                                                        statement, self.reachable_worlds)
+
             # After the attacker has taken enough cards, check if the deck is now empty and the defender has won
             if self.deck.is_empty():
                 if defender.hand.is_empty():
@@ -378,6 +445,17 @@ class DurakModel(Model):
 
             if num_cards_defender < self.num_starting_cards:
                 defender.take_cards_from_deck(self, self.num_starting_cards - num_cards_defender)
+                # Update the knowledge of defender
+                print("Updating knowledge after defender draws")
+                kripke_player = str(defender.get_id())
+                statement = make_statement_cards(self.deck.initial_deck, [kripke_player + str(c) for c in defender.hand.get_cards_in_hand()],
+                                                 kripke_player, False, len(self.deck.deck), len(self.discard_pile.cards))
+                print("Statement:", statement)
+
+                self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
+                                                                     statement, self.reachable_worlds)
+                self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
+                                                                        statement, self.reachable_worlds)
 
         # Determine who's turn it is now
         if attacker_wins:
@@ -447,6 +525,7 @@ def play(m):
     print(m)
 
     return m.get_game_data()
+
 
 m = DurakModel(verbose=True)
 # print("Starting state...")
