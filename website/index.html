@@ -349,13 +349,12 @@
                 <div class="col-6 col-12-small">
                   <h3>Mesa</h3>
                   <p>
-                    Nunc lacinia ante nunc ac lobortis. Interdum adipiscing
-                    gravida odio porttitor sem non mi integer non faucibus
-                    ornare mi ut ante amet placerat aliquet. Volutpat commodo eu
-                    sed ante lacinia. Sapien a lorem in integer ornare praesent
-                    commodo adipiscing arcu in massa commodo lorem accumsan at
-                    odio massa ac ac. Semper adipiscing varius montes viverra
-                    nibh in adipiscing blandit tempus accumsan.
+                    The model that models the agents and the workings of the
+                    game is based on the Python Mesa framework, version 0.8.7.
+                    This framework is mainly used for initializing the main
+                    model and the agents, as well as managing the flow of the
+                    game using stages in the CustomStagedActivation module. The
+                    visual simulation capabilities of Mesa have not been used.
                   </p>
                 </div>
                 <div class="col-6 col-12-small">
@@ -387,8 +386,8 @@
                     In order to determine whether using different orders of
                     knowledge influences a player's performance in the game, the
                     following experiments are performed. All experiments are
-                    performed with 3 players, 3 suits, 3 cards per suit, and 2
-                    starting cards.
+                    performed with 2 players, 2 suits, 3 cards per suit, and 1
+                    starting card.
                   </p>
                 </div>
                 <div class="col-6 col-12-small">
@@ -397,9 +396,26 @@
                     Before we can test whether using knowledge improves
                     performance, we need to create a basline. For this, we run
                     an experiment in which all three players use the random
-                    strategy: they always play a random card. Because no
-                    knowledge has to be used, the experiment runs quickly and we
-                    can easily play 1000 rounds.
+                    strategy: they always play a random card. The experiment is
+                    run for 100 rounds and clearly shows an approximately even
+                    divide in number of losses.
+                  </p>
+                </div>
+                <div class="col-5 col-12-small">
+                  <!-- <h3>Result</h3> -->
+                  <span class="image main"
+                    ><img src="images/random_random_100.png" alt=""
+                  /></span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-6 col-12-small">
+                  <h3>1st Order Knowledge VS Random Player</h3>
+                  <p>
+                    Next, we want to examine the performance boost that using
+                    first order knowledge yields, when playing against a random
+                    player.
                   </p>
                 </div>
                 <div class="col-5 col-12-small">
@@ -412,36 +428,11 @@
 
               <div class="row">
                 <div class="col-6 col-12-small">
-                  <h3>1st Order Knowledge VS Random Players</h3>
+                  <h3>2nd Order Knowledge VS Random Player</h3>
                   <p>
-                    In arcu accumsan arcu adipiscing accumsan orci ac. Felis id
-                    enim aliquet. Accumsan ac integer lobortis commodo ornare
-                    aliquet accumsan erat tempus amet porttitor. Ante commodo
-                    blandit adipiscing integer semper orci eget. Faucibus
-                    commodo adipiscing mi eu nullam accumsan morbi arcu ornare
-                    odio mi adipiscing nascetur lacus ac interdum morbi accumsan
-                    vis mi accumsan.
-                  </p>
-                </div>
-                <div class="col-5 col-12-small">
-                  <!-- <h3>Result</h3> -->
-                  <span class="image main"
-                    ><img src="images/random_random_random.png" alt=""
-                  /></span>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-6 col-12-small">
-                  <h3>2nd Order Knowledge VS Random Players</h3>
-                  <p>
-                    In arcu accumsan arcu adipiscing accumsan orci ac. Felis id
-                    enim aliquet. Accumsan ac integer lobortis commodo ornare
-                    aliquet accumsan erat tempus amet porttitor. Ante commodo
-                    blandit adipiscing integer semper orci eget. Faucibus
-                    commodo adipiscing mi eu nullam accumsan morbi arcu ornare
-                    odio mi adipiscing nascetur lacus ac interdum morbi accumsan
-                    vis mi accumsan.
+                    Similar to the previous experiment, we perform an experiment
+                    to determine whether using second order knowledge gives you
+                    an edge over a random player.
                   </p>
                 </div>
                 <div class="col-5 col-12-small">
@@ -456,13 +447,8 @@
                 <div class="col-6 col-12-small">
                   <h3>1st Order Knowledge VS 2nd Order Knowledge</h3>
                   <p>
-                    Nunc lacinia ante nunc ac lobortis. Interdum adipiscing
-                    gravida odio porttitor sem non mi integer non faucibus
-                    ornare mi ut ante amet placerat aliquet. Volutpat commodo eu
-                    sed ante lacinia. Sapien a lorem in integer ornare praesent
-                    commodo adipiscing arcu in massa commodo lorem accumsan at
-                    odio massa ac ac. Semper adipiscing varius montes viverra
-                    nibh in adipiscing blandit tempus accumsan.
+                    Lastly, we want to examine whether using second order
+                    knowledge is useful in this experimental setting.
                   </p>
                 </div>
                 <div class="col-5 col-12-small">
@@ -470,33 +456,6 @@
                   <span class="image main"
                     ><img src="images/random_random_100.png" alt=""
                   /></span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Results -->
-          <section id="results">
-            <div class="features">
-              <header class="major">
-                <h2>Results</h2>
-              </header>
-              <div class="row">
-                <div class="col-6 col-12-small">
-                  <h3>Only Random Players</h3>
-                  <p>As can be seen fr</p>
-                </div>
-                <div class="col-6 col-12-small">
-                  <h3>1st Order Knowledge VS Random Players</h3>
-                  <p>
-                    Nunc lacinia ante nunc ac lobortis. Interdum adipiscing
-                    gravida odio porttitor sem non mi integer non faucibus
-                    ornare mi ut ante amet placerat aliquet. Volutpat commodo eu
-                    sed ante lacinia. Sapien a lorem in integer ornare praesent
-                    commodo adipiscing arcu in massa commodo lorem accumsan at
-                    odio massa ac ac. Semper adipiscing varius montes viverra
-                    nibh in adipiscing blandit tempus accumsan.
-                  </p>
                 </div>
               </div>
             </div>
@@ -554,7 +513,6 @@
               <li><a href="#theory">Theory</a></li>
               <li><a href="#implementation">Implementation</a></li>
               <li><a href="#experiments">Experiments</a></li>
-              <li><a href="#results">Results</a></li>
               <li><a href="#conclusion">Conclusion</a></li>
             </ul>
           </nav>
