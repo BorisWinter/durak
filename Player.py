@@ -112,7 +112,8 @@ class Player(Agent):
                 this_player = str(self.get_id())
                 defender = self.get_next_player()
                 kripke_defender = str(defender.get_id())
-                kripke_defenders_cards = player_knows_cards_of_player(this_player, self.model.reachable_worlds, kripke_defender)
+                kripke_defenders_cards = player_knows_cards_of_player(self, self.model.reachable_worlds, kripke_defender)
+                print(kripke_defenders_cards)
                 print('OMG I JUST USED KNOWLEDGE')
                 # kripke_defenders_cards = []
                 defenders_cards = [c for c in defender.hand.cards if str(c) in kripke_defenders_cards]

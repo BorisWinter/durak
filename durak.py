@@ -16,12 +16,12 @@ class DurakModel(Model):
     def __init__(
             self,
             multiple = {},
-            num_players=3,
-            num_suits=3,
-            num_cards_per_suit=3,
-            num_starting_cards=2,
-            player_strategies=["normal", "normal", "normal"],
-            player_depths=[1, 1, 1],
+            num_players=2,
+            num_suits=2,
+            num_cards_per_suit=4,
+            num_starting_cards=1,
+            player_strategies=["normal", "normal"],
+            player_depths=[1, 1],
             verbose=True,
             multiple_runs = False):
         '''
