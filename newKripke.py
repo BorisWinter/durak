@@ -186,7 +186,7 @@ def knowledge_base(player, reachable):
     for item in my_list:
 
         print(item)
-        print("\n")
+
 
     #print("worlds in possible words")
     #print(my_list)
@@ -211,7 +211,7 @@ def player_knows_cards_of_player(player, reachable, about_player):
         if k[0] == about_player:    # now breaks for pure kripke dev
             print(k[1:])
             print(type(k[1:]))
-            known_cards.append(k[1:])
+            known_cards.append(str(k[1:]))
     print(f"Player {player.get_id()} knows that player {about_player} has:", known_cards)
 
     return known_cards

@@ -18,7 +18,7 @@ class DurakModel(Model):
             multiple = {},
             num_players=2,
             num_suits=2,
-            num_cards_per_suit=4,
+            num_cards_per_suit=2,
             num_starting_cards=1,
             player_strategies=["normal", "normal"],
             player_depths=[1, 1],
