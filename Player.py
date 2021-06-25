@@ -119,11 +119,7 @@ class Player(Agent):
                     # kripke_defenders_cards = []
                     print(kripke_defenders_cards)
 
-                list1=[]
-                for c in defender.hand.cards:
-                    if str(c) in kripke_defenders_cards:
-                        list1.append(c)
-                defenders_cards = list1#[c for c in defender.hand.cards if str(c) in kripke_defenders_cards]
+                defenders_cards = [c for c in defender.hand.cards if str(c) in kripke_defenders_cards]
                 highest_defending_card = None
 
                 # Calculate which card is the highest from all cards that you know the defender has
