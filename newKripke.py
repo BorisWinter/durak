@@ -144,9 +144,21 @@ def make_statement_cards(all_cards, true_cards, player_name, start, deck_size):
 
             # Deck can have only the allowed size, not less
             allowed_on_deck = list(itertools.combinations([c for c in all_cards if c not in true_cards], deck_size))
-            deck_statements = And(Atom('Deck' + str(allowed_on_deck[0][0])), Atom('Deck' + str(allowed_on_deck[0][1])))
-            for (c1, c2) in allowed_on_deck[1:]:
-                deck_statements = Or(deck_statements, (And(Atom('Deck' + str(c1)), Atom('Deck' + str(c2)))))
+            print(allowed_on_deck)
+
+            # single_deck_statement = Atom('Deck' + str(allowed_on_deck[0][0]))
+            # for j in range(1, deck_size):
+            #     single_deck_statement = And(single_deck_statement, Atom('Deck' + str(allowed_on_deck[0][j])))
+            # deck_statements = single_deck_statement
+
+            for i in range(0, len(allowed_on_deck)):
+                single_deck_statement = Atom('Deck' + str(allowed_on_deck[i][0]))
+                for j in range(1, deck_size):
+                    single_deck_statement = And(single_deck_statement, Atom('Deck' + str(allowed_on_deck[i][j])))
+                if i == 0:
+                    deck_statements = single_deck_statement
+                else:
+                    deck_statements = Or(deck_statements, single_deck_statement)
 
             statements.append(deck_statements)
 
