@@ -263,23 +263,21 @@
               <p>
                 These properties imply that our model is an S5 model. Hence, we
                 can use S5 inference rules in our model. In our implementation,
-                this means that we do not specify the links between worlds explicitly -
-                we only consider the worlds that are "reachable" by a player from
-                the current game state - a naive version of the equivalence classes
-                we discussed in the course. Hence, we do not have to specify the relations
-                between the "reachable worlds", since we know that they are transitive,
-                symmetric and reflexive, hence, euclidean, and that for every world in
-                "reachable worlds", it is connected to every other reachable world.
-                This allows us to represent the worlds as a "reachable worlds" list
-                per player in a given state, instead of a full Kripke model
-                with relations.
+                this means that we do not specify the links between worlds
+                explicitly - we only consider the worlds that are "reachable" by
+                a player from the current game state - a naive version of the
+                equivalence classes we discussed in the course. Hence, we do not
+                have to specify the relations between the "reachable worlds",
+                since we know that they are transitive, symmetric and reflexive,
+                hence, euclidean, and that for every world in "reachable
+                worlds", it is connected to every other reachable world. This
+                allows us to represent the worlds as a "reachable worlds" list
+                per player in a given state, instead of a full Kripke model with
+                relations.
 
                 <span class="image center"
                   ><img src="images/reachableWorlds.jpeg" alt=""
                 /></span>
-
-
-
               </p>
 
               <div class="content">
@@ -304,12 +302,12 @@
                 <h2>Common Knowledge</h2>
                 <p>
                   In Durak, there is a lot of common knowledge. When players
-                  attack, the attacking and defending cards become common knowledge, and the
-                  result of the attack (card to discard pile, or card to
-                  defending player) also becomes common knowledge. Hence, once a
-                  card has been played on the table once, every player always
-                  knows its location from that moment on.
-                  The players can use this common knowledge to reason with.
+                  attack, the attacking and defending cards become common
+                  knowledge, and the result of the attack (card to discard pile,
+                  or card to defending player) also becomes common knowledge.
+                  Hence, once a card has been played on the table once, every
+                  player always knows its location from that moment on. The
+                  players can use this common knowledge to reason with.
                 </p>
 
                 <p>
@@ -334,8 +332,8 @@
                 </p>
 
                 <p>
-                  Higher-order knowledge - we could think of strategies that involve higher
-                  order knowledge. 
+                  Higher-order knowledge - we could think of strategies that
+                  involve higher order knowledge.
                 </p>
 
                 <p>
@@ -479,22 +477,32 @@
               </header>
               <div class="row">
                 <div class="col-6 col-12-small">
-                  <h3>Conclusion1</h3>
+                  <h3>Conclusion</h3>
                   <p>
-                    We probably have too few cards to truly experiment
-                    with knowledge.
+                    It seems that the game in the experimental setting has too
+                    few cards to truly experiment with multiple levels of
+                    knowledge. The mechanics of the game, especially the
+                    possibility of cards moving from one player to another,
+                    severily affect the costs of running the model. The reason
+                    for this is that a defender losing and getting the attack
+                    card causes new possible worlds to appear approximately 50%
+                    of the time. Therefore, the number of possible worlds does not get
+                    smaller after that turn, it stays more or less equal. This
+                    leads to a lot of analysis being done over what is still a
+                    large number of possible worlds.
                   </p>
                 </div>
                 <div class="col-6 col-12-small">
-                  <h3>Conclusion2</h3>
+                  <h3>Future Research</h3>
                   <p>
-                    In arcu accumsan arcu adipiscing accumsan orci ac. Felis id
-                    enim aliquet. Accumsan ac integer lobortis commodo ornare
-                    aliquet accumsan erat tempus amet porttitor. Ante commodo
-                    blandit adipiscing integer semper orci eget. Faucibus
-                    commodo adipiscing mi eu nullam accumsan morbi arcu ornare
-                    odio mi adipiscing nascetur lacus ac interdum morbi accumsan
-                    vis mi accumsan.
+                    Future research should investigate the usefulness of higher
+                    orders of knowledge, even though the low number of cards in
+                    this limited version significantly limits the possibility of
+                    actually using that knowledge. Attempts to run experiments
+                    with a higher number of players and cards would also be
+                    interesting, as we assume that using higher order knowledge
+                    would be more beneficial when the number of possible game
+                    states grow.
                   </p>
                 </div>
               </div>
