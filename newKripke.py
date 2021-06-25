@@ -38,6 +38,7 @@ def false_in_worlds(ks, formula, reachable, player, remove):
 # TODO can we think of any more restrictions?
 def illegal_world(state_set, players, start_cards_per_player):
     # Just testing, with 4 cards or less
+
     if len(state_set) < 5:
         return False
 
@@ -45,7 +46,7 @@ def illegal_world(state_set, players, start_cards_per_player):
     if not state_set.count('Discard') % 2 == 0:
         return True
 
-    if state_set.count('Deck') > (len(state_set) - len(players) - start_cards_per_player):
+    if state_set.count('Deck') > (len(state_set) - (len(players) * start_cards_per_player)):
         # print(state_set.count('Deck'))
         return True
     for p in players:
