@@ -4,12 +4,6 @@ from ourFormula import Atom
 import itertools
 from progress.bar import *
 
-
-#class Kripke:
-
-#    def __init__(self):
-#        pass
-
 def worlds_by_names_for_player(ks, player, reachable):
     worlds_to_check = []
     bar = Bar("Finding worlds", max=len(ks.worlds))
@@ -21,33 +15,32 @@ def worlds_by_names_for_player(ks, player, reachable):
     return worlds_to_check
 
 
-def false_in_worlds(ks, formula, reachable, player, remove):
+def true_in_worlds(ks, formula, reachable, player, remove):
     """Returns a list with all worlds of Kripke structure, where formula
      is not satisfiable
     """
-    nodes_not_follow_formula = []
+    nodes_that_follow_formula = []
     bar = Bar(f'Checking worlds for {formula} being FALSE', max=len(ks.worlds))
     for w in ks.worlds:
-        if not formula.semantic(ks, w):
+        if formula.semantic(ks, w) is True:
             # if not remove or (remove and w.name in reachable[player]):
-            nodes_not_follow_formula.append(w)
+            nodes_that_follow_formula.append(w)
     bar.finish()
-    return nodes_not_follow_formula
+    return nodes_that_follow_formula
 
 
 # TODO can we think of any more restrictions?
 def illegal_world(state_set, players, start_cards_per_player):
-    # Just testing, with 4 cards or less
-
-    if len(state_set) < 5:
+    # Just testing, with 2 cards or less
+    if len(state_set) < 2:
         return False
 
     # Two cards go to the Discard pile at a time, so total count must be even
     if not state_set.count('Discard') % 2 == 0:
         return True
-
+    print(state_set.count('Deck'))
     if state_set.count('Deck') > (len(state_set) - (len(players) * start_cards_per_player)):
-        # print(state_set.count('Deck'))
+        print(state_set.count('Deck'))
         return True
     for p in players:
         # one player has all the cards (TODO only removes three states)
@@ -92,7 +85,7 @@ def gen_empty_kripke(worlds, players):
 def bad_remove_links(ks, player, statement, reachable):
     """
     Remove all links for the given player to/from all REACHABLE
-    worlds in which the given statement is TODO FALSE.
+    worlds in which the given statement is false.
     """
     print("Removing links...")
     worlds_to_check = worlds_by_names_for_player(ks, player, reachable)
@@ -100,7 +93,7 @@ def bad_remove_links(ks, player, statement, reachable):
     # print([(w.name, w.assignment) for w in ks.worlds])
 
     # print(len(reachable[player]))
-    worlds_to_remove = false_in_worlds(test_model, statement)
+    worlds_to_remove = true_in_worlds(test_model, Not(statement))
     # print(len(false_in_worlds(test_model, statement)))
     print("\t Number of worlds from/to which to remove relations:", len(worlds_to_remove))
     if len(worlds_to_remove) < 20:
@@ -115,10 +108,10 @@ def bad_remove_links(ks, player, statement, reachable):
 def remove_links(ks, player, statement, reachable):
     """
     Remove all links for the given player to/from ALL
-    worlds in which the given statement is TODO FALSE.
+    worlds in which the given statement is false.
     """
     #print("Removing links...")
-    worlds_where_false = false_in_worlds(ks, statement, reachable, player, True)
+    worlds_where_false = true_in_worlds(ks, Not(statement), reachable, player, True)
     #print("\t Number of worlds from/to which to remove relations (incl. already unreachable):", len(worlds_where_false))
     #if len(worlds_where_false) < 20:
         #print("\t Worlds from/to which to remove relations:", [w.name for w in worlds_where_false])
@@ -156,11 +149,11 @@ def make_statement_cards(all_cards, true_cards, player_name):
 def add_links(ks, player, statement, reachable):
     """
     Add all links for the given player to/from worlds
-    in which the given statement is TODO TRUE.
+    in which the given statement is true.
     """
     #print("Adding links...")
 
-    worlds_to_add = false_in_worlds(ks, Not(statement), reachable, player, False)
+    worlds_to_add = true_in_worlds(ks, statement, reachable, player, False)
     #print("\t Number of worlds from/to which to add relations:", len(worlds_to_add))
     #if len(worlds_to_add) < 20:
         #print("\t Worlds from/to which to add relations:", [w.name for w in worlds_to_add])
