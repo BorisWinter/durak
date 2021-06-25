@@ -4,12 +4,6 @@ from ourFormula import Atom
 import itertools
 from progress.bar import *
 
-
-#class Kripke:
-
-#    def __init__(self):
-#        pass
-
 def worlds_by_names_for_player(ks, player, reachable):
     worlds_to_check = []
     bar = Bar("Finding worlds", max=len(ks.worlds))
@@ -21,31 +15,32 @@ def worlds_by_names_for_player(ks, player, reachable):
     return worlds_to_check
 
 
-def false_in_worlds(ks, formula, reachable, player, remove):
+def true_in_worlds(ks, formula, reachable, player, remove):
     """Returns a list with all worlds of Kripke structure, where formula
      is not satisfiable
     """
-    nodes_not_follow_formula = []
+    nodes_that_follow_formula = []
     bar = Bar(f'Checking worlds for {formula} being FALSE', max=len(ks.worlds))
     for w in ks.worlds:
-        if not formula.semantic(ks, w):
+        if formula.semantic(ks, w) is True:
             # if not remove or (remove and w.name in reachable[player]):
-            nodes_not_follow_formula.append(w)
+            nodes_that_follow_formula.append(w)
     bar.finish()
-    return nodes_not_follow_formula
+    return nodes_that_follow_formula
 
 
 # TODO can we think of any more restrictions?
 def illegal_world(state_set, players, start_cards_per_player):
-    # Just testing, with 4 cards or less
-    if len(state_set) < 5:
+    # Just testing, with 2 cards or less
+    if len(state_set) < 2:
         return False
 
     # Two cards go to the Discard pile at a time, so total count must be even
     if not state_set.count('Discard') % 2 == 0:
         return True
-
-    if state_set.count('Deck') > (len(state_set) - len(players) - start_cards_per_player):
+    # print(state_set.count('Deck'))
+    if state_set.count('Deck') > (len(state_set) - (len(players) * start_cards_per_player)):
+        # print("MAX", len(state_set) - (len(players) * start_cards_per_player))
         # print(state_set.count('Deck'))
         return True
     for p in players:
@@ -56,7 +51,7 @@ def illegal_world(state_set, players, start_cards_per_player):
     return False
 
 
-def gen_worlds(cards, players, hand_players):
+def gen_worlds(cards, players, hand_players, start_cards_per_player):
     """
     Generates all possible worlds in the game for the given players and cards.
     """
@@ -66,7 +61,7 @@ def gen_worlds(cards, players, hand_players):
     worlds = []
     bar = Bar('Generating worlds', max=len(locations)/2, suffix='%(percent)d%%')
     for i, state_set in enumerate(locations):
-        if not illegal_world(state_set, hand_players, 2):
+        if not illegal_world(state_set, hand_players, start_cards_per_player):
             # print(i)
             d = {place + cards[j]: True for j, place in enumerate(state_set)}
             w = World(str(i), d)
@@ -91,7 +86,7 @@ def gen_empty_kripke(worlds, players):
 def bad_remove_links(ks, player, statement, reachable):
     """
     Remove all links for the given player to/from all REACHABLE
-    worlds in which the given statement is TODO FALSE.
+    worlds in which the given statement is false.
     """
     print("Removing links...")
     worlds_to_check = worlds_by_names_for_player(ks, player, reachable)
@@ -99,7 +94,7 @@ def bad_remove_links(ks, player, statement, reachable):
     # print([(w.name, w.assignment) for w in ks.worlds])
 
     # print(len(reachable[player]))
-    worlds_to_remove = false_in_worlds(test_model, statement)
+    worlds_to_remove = true_in_worlds(test_model, Not(statement))
     # print(len(false_in_worlds(test_model, statement)))
     print("\t Number of worlds from/to which to remove relations:", len(worlds_to_remove))
     if len(worlds_to_remove) < 20:
@@ -114,10 +109,10 @@ def bad_remove_links(ks, player, statement, reachable):
 def remove_links(ks, player, statement, reachable):
     """
     Remove all links for the given player to/from ALL
-    worlds in which the given statement is TODO FALSE.
+    worlds in which the given statement is false.
     """
     #print("Removing links...")
-    worlds_where_false = false_in_worlds(ks, statement, reachable, player, True)
+    worlds_where_false = true_in_worlds(ks, Not(statement), reachable, player, True)
     #print("\t Number of worlds from/to which to remove relations (incl. already unreachable):", len(worlds_where_false))
     #if len(worlds_where_false) < 20:
         #print("\t Worlds from/to which to remove relations:", [w.name for w in worlds_where_false])
@@ -128,18 +123,48 @@ def remove_links(ks, player, statement, reachable):
             reachable[player].remove(w)
     # reachable[player] = list(set(reachable[player]).difference(set(worlds_where_false)))
 
-
     return ks, reachable
+
+
+def make_statement_cards(all_cards, true_cards, player_name, start, deck_size):
+    '''
+    Makes a big statement of all cards a player has,
+    plus if called at the start of the game,
+    the size of the deck and discard pile.
+    '''
+    statements = []
+
+    for card in all_cards:
+        if card not in true_cards:
+            statements.append(Not(Atom(player_name + str(card))))  # cards that are not said to be in the player's hand
+        else:
+            statements.append(Atom(player_name + str(card)))  # cards that are said to be in the player's hand
+        if start:
+            statements.append(Not(Atom('Discard'+str(card))))  # discard pile empty
+
+            # Deck can have only the allowed size, not less
+            allowed_on_deck = list(itertools.combinations([c for c in all_cards if c not in true_cards], deck_size))
+            deck_statements = And(Atom('Deck' + str(allowed_on_deck[0][0])), Atom('Deck' + str(allowed_on_deck[0][1])))
+            for (c1, c2) in allowed_on_deck[1:]:
+                deck_statements = Or(deck_statements, (And(Atom('Deck' + str(c1)), Atom('Deck' + str(c2)))))
+
+            statements.append(deck_statements)
+
+    # All of these negations of statements must be true
+    big_conj = statements[0]
+    for s in statements[1:]:
+        big_conj = And(big_conj, s)
+    return big_conj
 
 
 def add_links(ks, player, statement, reachable):
     """
     Add all links for the given player to/from worlds
-    in which the given statement is TODO TRUE.
+    in which the given statement is true.
     """
     #print("Adding links...")
 
-    worlds_to_add = false_in_worlds(ks, Not(statement), reachable, player, False)
+    worlds_to_add = true_in_worlds(ks, statement, reachable, player, False)
     #print("\t Number of worlds from/to which to add relations:", len(worlds_to_add))
     #if len(worlds_to_add) < 20:
         #print("\t Worlds from/to which to add relations:", [w.name for w in worlds_to_add])
@@ -221,7 +246,7 @@ def dev_test():
     # Development sets
     full_numbers = ['2', '3', '4']
     full_suits = ['S', 'C', 'H']
-    test_cards = ['2S', '2C']
+    test_cards = ['2S', '2C', '2H']
     test_players = ['B', 'Deck']
     test_hand_players = ['B']
 
@@ -229,16 +254,22 @@ def dev_test():
     print("Reachable:", reachable_worlds)
     print("Full model:", k_m)
 
-    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-    test_added, reachable_worlds = add_links(k_m, 'B', Atom('B2S'), reachable_worlds)
-    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-    print(reachable_worlds['B'])
-    test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('Deck2C'), reachable_worlds)
-    print("Number of reachable worlds for B:", len(reachable_worlds['B']))
-    print(reachable_worlds['B'])
+    statement = make_statement_cards(test_cards, ['2S', '2C'], 'B')
+    print(statement)
 
-    # knowledge_base('B', reachable_worlds)
-    player_knows_cards_of_player('B', reachable_worlds, 'Deck')
+    print(k_m.solve(statement))
+
+    # print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    # test_added, reachable_worlds = add_links(k_m, 'B', Atom('B2S'), reachable_worlds)
+    # print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    # print(reachable_worlds['B'])
+    # test_removed, reachable_worlds = remove_links(k_m, 'B', Atom('Deck2C'), reachable_worlds)
+    # print("Number of reachable worlds for B:", len(reachable_worlds['B']))
+    # print(reachable_worlds['B'])
+    #
+    # # knowledge_base('B', reachable_worlds)
+    # player_knows_cards_of_player('B', reachable_worlds, 'Deck')
+
     # REMOVES all worlds in which formula is not True
     # print(test_added.solve(And(Atom('B2S'), Atom('B2C'))))
 
@@ -277,6 +308,8 @@ def demo_full():
 # d_1.update(d_2)
 # print(d_1)
 #
+
+
 
 
 
