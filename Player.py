@@ -113,15 +113,15 @@ class Player(Agent):
                 defender = self.get_next_player()
                 kripke_defender = str(defender.get_id())
                 kripke_defenders_cards = player_knows_cards_of_player(self, self.model.reachable_worlds, kripke_defender)
-                print(kripke_defenders_cards)
-                print('OMG I JUST USED KNOWLEDGE')
-                # kripke_defenders_cards = []
-                print(kripke_defenders_cards)
+                if self.model.verbose:
+                    print(kripke_defenders_cards)
+                    print('OMG I JUST USED KNOWLEDGE')
+                    # kripke_defenders_cards = []
+                    print(kripke_defenders_cards)
 
                 list1=[]
                 for c in defender.hand.cards:
                     if str(c) in kripke_defenders_cards:
-                        print(c)
                         list1.append(c)
                 defenders_cards = list1#[c for c in defender.hand.cards if str(c) in kripke_defenders_cards]
                 highest_defending_card = None
