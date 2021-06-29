@@ -145,9 +145,11 @@ class DurakModel(Model):
 
         # Add the starting card knowledge to the Kripke model
         for player in self.players:
+            print("Updating model at start of game")
             kripke_player = str(player.get_id())
             statement = make_statement_cards(self.deck.initial_deck, [kripke_player + str(c) for c in player.hand.get_cards_in_hand()], kripke_player,
                                              True, len(self.deck.deck), len(self.discard_pile.cards))
+            # print("\t Statement:", statement)
             # print("cards are", player.hand.get_cards_in_hand())
             self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
                                                                  statement, self.reachable_worlds)
@@ -249,6 +251,7 @@ class DurakModel(Model):
         if attacker_wins:
             if self.verbose:
                 print("Player " + str(attacker.get_id()) + " won! The cards go to player " + str(defender.get_id()))
+                print("------------------------")
             # Defender gets the cards if attacker wins
             for attack_card in attack_cards:
                 defender.receive_card(attack_card)
@@ -277,21 +280,23 @@ class DurakModel(Model):
                 known_cards_defender = list(knowledge_base(player, self.reachable_worlds))
                 known_cards_defender.append(kripke_defender + kripke_defence_card)
                 known_cards_defender.append(kripke_defender + kripke_attack_card)
-                print("YOEEEEEEEEEEEEEEEEEEEHOEEEEEEEEEEEEEEEEEEEEEEE", known_cards_defender)
+                # print("YOEEEEEEEEEEEEEEEEEEEHOEEEEEEEEEEEEEEEEEEEEEEE", known_cards_defender)
                 statement = make_statement_cards(self.deck.initial_deck, known_cards_defender, kripke_defender,
                                                  False, len(self.deck.deck), len(self.discard_pile.cards))
                 statement = And(statement, Not(Atom(kripke_attacker + kripke_attack_card)))
-                print("Statement:", statement)
+                # print("\t Statement:", statement)
 
                 self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
                                                                      statement, self.reachable_worlds)
                 self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
                                                                         statement, self.reachable_worlds)
+            print("------------------------")
 
         # Resolving of the attack if the defender wins
         else:
             if self.verbose:
                 print("Player " + str(defender.get_id()) + " won! The cards go to the discard pile!")
+                print("------------------------")
             # Discard pile gets the cards otherwise
             for attack_card in attack_cards:
                 self.discard_pile.add_card(attack_card)
@@ -320,7 +325,7 @@ class DurakModel(Model):
                 #     self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
                 #                                                             statement, self.reachable_worlds)
 
-                print("Updating model after successful defense YAY")
+                print("Updating model after successful defense")
 
                 # known_cards_discard = list(player_knows_cards_of_player(player, self.reachable_worlds, kripke_discard_pile))
                 known_cards_discard = list(knowledge_base(player, self.reachable_worlds))
@@ -335,7 +340,7 @@ class DurakModel(Model):
                 # statement.append(Not(Atom(kripke_attacker + kripke_attack_card)))
                 statement = And(statement, Not(Atom(kripke_attacker + kripke_attack_card)))
                 statement = And(statement, Not(Atom(kripke_defender + kripke_defence_card)))
-                print("Statement:", statement)
+                # print("\t Statement:", statement)
 
                 self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
                                                                      statement, self.reachable_worlds)
@@ -356,6 +361,7 @@ class DurakModel(Model):
                 # self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
                 #                                                         Atom(kripke_discard_pile + kripke_defence_card),
                 #                                                         self.reachable_worlds)
+            print("------------------------")
 
         # If the deck is empty, no cards can be taken: check if there are winners
         if self.deck.is_empty():
@@ -414,10 +420,11 @@ class DurakModel(Model):
 
                 # Update the knowledge of attacker
                 kripke_player = str(attacker.get_id())
+                print("Updating model after attacker draws")
                 statement = make_statement_cards(self.deck.initial_deck, [kripke_player + str(c) for c in attacker.hand.get_cards_in_hand()],
                                                  kripke_player, False, len(self.deck.deck), len(self.discard_pile.cards))
-                print("Updating model after attacker draws")
-                print("Statement:", statement)
+
+                # print("\t Statement:", statement)
                 self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
                                                                      statement, self.reachable_worlds)
                 self.kripke_model, self.reachable_worlds = remove_links(self.kripke_model, kripke_player,
@@ -450,7 +457,7 @@ class DurakModel(Model):
                 kripke_player = str(defender.get_id())
                 statement = make_statement_cards(self.deck.initial_deck, [kripke_player + str(c) for c in defender.hand.get_cards_in_hand()],
                                                  kripke_player, False, len(self.deck.deck), len(self.discard_pile.cards))
-                print("Statement:", statement)
+                # print("\t Statement:", statement)
 
                 self.kripke_model, self.reachable_worlds = add_links(self.kripke_model, kripke_player,
                                                                      statement, self.reachable_worlds)

@@ -113,11 +113,9 @@ class Player(Agent):
                 defender = self.get_next_player()
                 kripke_defender = str(defender.get_id())
                 kripke_defenders_cards = player_knows_cards_of_player(self, self.model.reachable_worlds, kripke_defender)
-                if self.model.verbose:
-                    print(kripke_defenders_cards)
-                    print('OMG I JUST USED KNOWLEDGE')
-                    # kripke_defenders_cards = []
-                    print(kripke_defenders_cards)
+                # if self.model.verbose:
+                #     print(kripke_defenders_cards)
+                #     print('OMG I JUST USED KNOWLEDGE')
 
                 defenders_cards = [c for c in defender.hand.cards if str(c) in kripke_defenders_cards]
                 highest_defending_card = None
@@ -153,7 +151,7 @@ class Player(Agent):
         kripke_attacker = str(self.get_id())
         kripke_defender = str(self.get_next_player().get_id())
         kripke_card = str(card)
-        print("\t (in Player) removing links for attacker", kripke_attacker, "defender", kripke_defender, "and card", kripke_card)
+        # print("\t (in Player) removing links for attacker", kripke_attacker, "defender", kripke_defender, "and card", kripke_card)
         remove_links(self.model.kripke_model, kripke_defender, Atom(kripke_attacker + kripke_card),
                      self.model.reachable_worlds)
 

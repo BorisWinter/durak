@@ -127,7 +127,7 @@ def remove_links(ks, player, statement, reachable):
 
 
 def make_statement_cards(all_cards, true_cards, player_name, start, deck_size, discard_size):
-    print("TRUE CARDS:", true_cards, player_name)
+    print("\t Making big statement with addition of cards:", true_cards)
     '''
     Makes a big statement of all cards a player has,
     plus if called at the start of the game,
@@ -163,7 +163,7 @@ def make_statement_cards(all_cards, true_cards, player_name, start, deck_size, d
             else:
                 print("---------------------------------------------")
                 for i in range(0, len(allowed_on_discard)):
-                    print("\t\t Allowed on discard:", allowed_on_discard[i])
+                    # print("\t\t Allowed on discard:", allowed_on_discard[i])
                     single_discard_statement = Atom('Discard' + str(allowed_on_discard[i][0]))
                     for j in range(1, discard_size):
                         single_discard_statement = And(single_discard_statement, Atom('Discard' + str(allowed_on_discard[i][j])))
@@ -179,6 +179,7 @@ def make_statement_cards(all_cards, true_cards, player_name, start, deck_size, d
     big_conj = statements[0]
     for s in statements[1:]:
         big_conj = And(big_conj, s)
+    # print("\t Statement:", big_conj)
     return big_conj
 
 
@@ -217,7 +218,7 @@ def add_links(ks, player, statement, reachable):
 
 
 def knowledge_base(player, reachable):
-    print("PLAYER", str(player.get_id()), "has hand", player.hand)
+    # print("PLAYER", str(player.get_id()), "has hand", player.hand)
     # print("Above player has worlds:", [w.assignment for w in reachable[str(player.get_id())]])
     concatting = [str(player.get_id())+str(item) for item in player.hand.get_cards_in_hand()]
     my_list = []
